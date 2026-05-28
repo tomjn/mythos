@@ -1,4 +1,6 @@
 import type { Match, MatchAction, Player, PlayerIndex } from './types'
+import { createInitialMatch } from './state'
+import { BASE_CHAKRA, MIN_START_MS } from './constants'
 
 function settle(m: Match, now: number): Match {
   let players = m.players
@@ -50,6 +52,46 @@ export function matchReducer(m: Match, action: MatchAction): Match {
       const stopped = setPlayer(settled, action.player, { clockMs: 0, timedOut: true })
       const wasActive = settled.active === action.player
       return wasActive ? { ...stopped, active: null, activeSince: null } : stopped
+    }
+    case 'ADJUST_CHAKRA':
+      return setPlayer(m, action.player, { chakra: Math.max(0, m.players[action.player].chakra + action.delta) })
+    case 'RESET_CHAKRA':
+      return setPlayer(m, action.player, { chakra: BASE_CHAKRA })
+    case 'ADJUST_MISSION':
+      return setPlayer(m, action.player, { mission: Math.max(0, m.players[action.player].mission + action.delta) })
+    case 'SET_EDGE':
+      return { ...m, edge: m.edge === action.player ? null : action.player }
+    case 'SET_START_TIME': {
+      const start = Math.max(MIN_START_MS, action.ms)
+      return {
+        ...m,
+        settings: { startMs: start },
+        active: null,
+        activeSince: null,
+        paused: true,
+        players: [
+          { ...m.players[0], clockMs: start, timedOut: false },
+          { ...m.players[1], clockMs: start, timedOut: false },
+        ],
+      }
+    }
+    case 'TOGGLE_ROUND_TIMER': {
+      const settled = settle(m, action.now)
+      const enabled = !settled.roundTimer.enabled
+      return {
+        ...settled,
+        roundTimer: { ...settled.roundTimer, enabled },
+        roundSince: enabled && !settled.paused && settled.active != null ? action.now : null,
+      }
+    }
+    case 'SET_ROUND_DURATION':
+      return { ...m, roundTimer: { ...m.roundTimer, durationMs: action.ms, remainingMs: action.ms }, roundSince: null }
+    case 'NEW_MATCH': {
+      const seed = createInitialMatch(m.settings.startMs)
+      return {
+        ...seed,
+        roundTimer: { enabled: m.roundTimer.enabled, durationMs: m.roundTimer.durationMs, remainingMs: m.roundTimer.durationMs },
+      }
     }
     default:
       return m

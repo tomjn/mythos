@@ -1,5 +1,7 @@
 # Mythos TCG Arena Counter
 
+**Live app: <https://tomjn.github.io/mythos/>**
+
 A two-player match counter for the Mythos trading card game, built for a phone
 laid flat between both players. The board renders right-side-up from both seats
 (the top panel is mirrored), and everything you need to track during a game lives
@@ -40,6 +42,14 @@ Then open the URL Vite prints (default <http://localhost:5173>).
 | `npm run lint`     | Run ESLint                                   |
 | `npm test`         | Run the test suite once (Vitest)             |
 | `npm run test:watch` | Run tests in watch mode                    |
+
+## Deployment
+
+The app is hosted on GitHub Pages at <https://tomjn.github.io/mythos/>. A GitHub
+Actions workflow (`.github/workflows/deploy.yml`) runs the test suite, builds the
+site, and publishes it automatically on every push to `main`. The build uses
+relative asset paths (`base: './'`) and hash-based routing, so the same output
+also works when embedded at a sub-path elsewhere.
 
 ## Tech stack
 

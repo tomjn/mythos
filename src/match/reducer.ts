@@ -43,9 +43,15 @@ export function matchReducer(m: Match, action: MatchAction): Match {
       return { ...settled, paused: true, activeSince: null, roundSince: null }
     }
     case 'RESUME': {
-      if (m.active == null) return m
-      return { ...m, paused: false, activeSince: action.now,
-        roundSince: m.roundTimer.enabled ? action.now : null }
+      const runClock = m.active != null
+      const runRound = m.roundTimer.enabled
+      if (!runClock && !runRound) return m
+      return {
+        ...m,
+        paused: false,
+        activeSince: runClock ? action.now : null,
+        roundSince: runRound ? action.now : null,
+      }
     }
     case 'TIMEOUT': {
       const settled = settle(m, action.now)
@@ -82,8 +88,11 @@ export function matchReducer(m: Match, action: MatchAction): Match {
       const enabled = !settled.roundTimer.enabled
       return {
         ...settled,
-        roundTimer: { ...settled.roundTimer, enabled },
-        roundSince: enabled && !settled.paused && settled.active != null ? action.now : null,
+        active: null,
+        activeSince: null,
+        paused: true,
+        roundSince: null,
+        roundTimer: { ...settled.roundTimer, enabled, remainingMs: settled.roundTimer.durationMs },
       }
     }
     case 'SET_ROUND_DURATION':

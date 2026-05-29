@@ -5,7 +5,7 @@ import { useWakeLock } from '@/hooks/useWakeLock'
 
 export function MatchScreen() {
   const { match } = useMatch()
-  useWakeLock(!match.paused && match.active != null)
+  useWakeLock(!match.paused && (match.active != null || match.roundTimer.enabled))
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1"><PlayerPanel index={1} flipped /></div>

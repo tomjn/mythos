@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { matchReducer } from './reducer'
 import { createInitialMatch } from './state'
-import { liveClockMs } from './timing'
+import { liveClockMs, liveRoundMs } from './timing'
 import { MIN_START_MS, BASE_CHAKRA } from './constants'
 
 const fresh = () => createInitialMatch(MIN_START_MS)
@@ -84,6 +84,16 @@ describe('reducer counters & toggles', () => {
   it('TOGGLE_ROUND_TIMER flips enabled', () => {
     const m = matchReducer(fresh(), { type: 'TOGGLE_ROUND_TIMER', now: 0 })
     expect(m.roundTimer.enabled).toBe(true)
+  })
+  it('RESUME starts the shared round timer in round mode (no active player)', () => {
+    let m = matchReducer(fresh(), { type: 'TOGGLE_ROUND_TIMER', now: 0 })
+    expect(m.roundTimer.enabled).toBe(true)
+    expect(m.active).toBeNull()
+    expect(m.paused).toBe(true)
+    m = matchReducer(m, { type: 'RESUME', now: 1000 })
+    expect(m.paused).toBe(false)
+    expect(m.roundSince).toBe(1000)
+    expect(liveRoundMs(m, 4000)).toBe(m.roundTimer.durationMs - 3000)
   })
   it('SET_ROUND_DURATION resets duration and remaining', () => {
     const m = matchReducer(fresh(), { type: 'SET_ROUND_DURATION', ms: 12_345 })

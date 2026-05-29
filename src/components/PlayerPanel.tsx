@@ -1,5 +1,5 @@
 import { useMatch, useNow } from '@/match/MatchContext'
-import { liveClockMs } from '@/match/timing'
+import { liveClockMs, liveRoundMs } from '@/match/timing'
 import type { PlayerIndex } from '@/match/types'
 import { ClockDisplay } from './ClockDisplay'
 import { StatTile } from './StatTile'
@@ -7,10 +7,11 @@ import { EdgePill } from './EdgePill'
 
 export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: boolean }) {
   const { match, dispatch } = useMatch()
-  const running = match.active === index && !match.paused
+  const roundMode = match.roundTimer.enabled
+  const running = roundMode ? !match.paused : match.active === index && !match.paused
   const now = useNow(running)
   const player = match.players[index]
-  const clock = liveClockMs(match, index, now)
+  const displayMs = roundMode ? liveRoundMs(match, now) : liveClockMs(match, index, now)
 
   return (
     <div
@@ -25,11 +26,12 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
 
       <button
         data-testid={`tap-surface-${index}`}
-        aria-label={`Pass clock from ${player.name}`}
-        onClick={() => dispatch({ type: 'TAP_HALF', player: index, now: Date.now() })}
-        className="flex flex-1 items-center justify-center"
+        aria-label={roundMode ? 'Shared round timer running' : `Pass clock from ${player.name}`}
+        onClick={roundMode ? undefined : () => dispatch({ type: 'TAP_HALF', player: index, now: Date.now() })}
+        disabled={roundMode}
+        className="flex flex-1 items-center justify-center disabled:cursor-default"
       >
-        <ClockDisplay ms={clock} timedOut={player.timedOut} />
+        <ClockDisplay ms={displayMs} timedOut={roundMode ? false : player.timedOut} />
       </button>
 
       <div className="grid grid-cols-2">

@@ -35,6 +35,7 @@ export type MatchAction =
   | { type: 'ADJUST_CHAKRA'; player: PlayerIndex; delta: number }
   | { type: 'RESET_CHAKRA'; player: PlayerIndex }
   | { type: 'ADJUST_MISSION'; player: PlayerIndex; delta: number }
+  | { type: 'RESET_MISSION'; player: PlayerIndex }
   | { type: 'SET_EDGE'; player: PlayerIndex }
   | { type: 'SET_START_TIME'; ms: number }
   | { type: 'TOGGLE_ROUND_TIMER'; now: number }

@@ -4,7 +4,6 @@ import type { PlayerIndex } from '@/match/types'
 import { ClockDisplay } from './ClockDisplay'
 import { StatTile } from './StatTile'
 import { EdgePill } from './EdgePill'
-import { BASE_CHAKRA } from '@/match/constants'
 
 export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: boolean }) {
   const { match, dispatch } = useMatch()
@@ -39,8 +38,6 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
           value={player.chakra}
           onInc={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: 1 })}
           onDec={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: -1 })}
-          preset={BASE_CHAKRA}
-          onPreset={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: BASE_CHAKRA })}
           onReset={() => dispatch({ type: 'RESET_CHAKRA', player: index })}
         />
         <StatTile
@@ -48,6 +45,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
           value={player.mission}
           onInc={() => dispatch({ type: 'ADJUST_MISSION', player: index, delta: 1 })}
           onDec={() => dispatch({ type: 'ADJUST_MISSION', player: index, delta: -1 })}
+          onReset={() => dispatch({ type: 'RESET_MISSION', player: index })}
         />
       </div>
     </div>

@@ -13,7 +13,7 @@ function StartProbe() {
 }
 
 describe('SettingsScreen', () => {
-  it('enforces the 30-minute floor on start time', async () => {
+  it('enforces the 15-minute floor on start time', async () => {
     render(
       <MemoryRouter>
         <MatchProvider><SettingsScreen /><StartProbe /></MatchProvider>
@@ -23,7 +23,7 @@ describe('SettingsScreen', () => {
     await userEvent.clear(input)
     await userEvent.type(input, '10')
     await userEvent.click(screen.getByRole('button', { name: /apply time/i }))
-    expect(screen.getByTestId('start').textContent).toBe(String(30 * 60 * 1000))
+    expect(screen.getByTestId('start').textContent).toBe(String(15 * 60 * 1000))
   })
 
   it('toggles the round timer', async () => {

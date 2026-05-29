@@ -59,6 +59,8 @@ export function matchReducer(m: Match, action: MatchAction): Match {
       return setPlayer(m, action.player, { chakra: BASE_CHAKRA })
     case 'ADJUST_MISSION':
       return setPlayer(m, action.player, { mission: Math.max(0, m.players[action.player].mission + action.delta) })
+    case 'RESET_MISSION':
+      return setPlayer(m, action.player, { mission: 0 })
     case 'SET_EDGE':
       return { ...m, edge: m.edge === action.player ? null : action.player }
     case 'SET_START_TIME': {

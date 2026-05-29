@@ -19,7 +19,7 @@ describe('createInitialMatch', () => {
     expect(m.activeSince).toBeNull()
     expect(m.edge).toBeNull()
   })
-  it('enforces the 30-minute floor', () => {
+  it('enforces the 15-minute floor', () => {
     const m = createInitialMatch(60_000)
     expect(m.settings.startMs).toBe(MIN_START_MS)
     expect(m.players[0].clockMs).toBe(MIN_START_MS)

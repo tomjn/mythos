@@ -21,9 +21,9 @@ export function SettingsScreen() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="start">Minutes per player (min 30)</Label>
+        <Label htmlFor="start">Minutes per player (min 15)</Label>
         <div className="flex gap-2">
-          <Input id="start" type="number" inputMode="numeric" min={30} value={minutes}
+          <Input id="start" type="number" inputMode="numeric" min={15} value={minutes}
             onChange={(e) => setMinutes(e.target.value)} />
           <Button onClick={() => dispatch({ type: 'SET_START_TIME', ms: Math.max(MIN_START_MS, Number(minutes) * 60000) })}>
             Apply time

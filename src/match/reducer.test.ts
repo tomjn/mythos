@@ -59,6 +59,11 @@ describe('reducer counters & toggles', () => {
     const m = matchReducer(fresh(), { type: 'ADJUST_MISSION', player: 1, delta: -3 })
     expect(m.players[1].mission).toBe(0)
   })
+  it('RESET_MISSION returns mission to zero', () => {
+    let m = matchReducer(fresh(), { type: 'ADJUST_MISSION', player: 0, delta: 7 })
+    m = matchReducer(m, { type: 'RESET_MISSION', player: 0 })
+    expect(m.players[0].mission).toBe(0)
+  })
   it('SET_EDGE is exclusive and toggles off the current holder', () => {
     let m = matchReducer(fresh(), { type: 'SET_EDGE', player: 0 })
     expect(m.edge).toBe(0)

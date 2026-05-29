@@ -13,7 +13,7 @@ export function ClockDisplay({ ms, timedOut }: { ms: number; timedOut: boolean }
       data-testid="clock"
       data-timedout={timedOut}
       data-level={level}
-      className={`text-center font-mono font-bold tabular-nums leading-none ${danger ? 'animate-pulse' : ''}`}
+      className={`text-center font-mono font-bold tabular-nums leading-none transition-colors duration-300 ${danger ? 'animate-pulse' : ''}`}
       style={{
         fontSize: 'clamp(3rem, 14vw, 6rem)',
         color: danger ? DANGER_COLOR : warn ? WARN_COLOR : 'var(--player-accent)',

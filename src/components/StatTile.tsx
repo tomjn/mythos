@@ -14,12 +14,13 @@ export function StatTile({ label, value, onInc, onDec, onReset }: StatTileProps)
       <div className="flex items-center gap-2">
         <span className="text-xs font-semibold tracking-widest opacity-80">{label}</span>
         {onReset && (
-          <button aria-label={`Reset ${label}`} onClick={onReset} className="opacity-70 active:opacity-100">
+          <button aria-label={`Reset ${label}`} onClick={onReset}
+            className="opacity-70 transition-transform duration-200 active:-rotate-45 active:scale-90 active:opacity-100">
             <RotateCcw size={16} />
           </button>
         )}
       </div>
-      <div className="text-4xl font-bold tabular-nums" style={{ color: 'var(--player-accent)' }}>{value}</div>
+      <div key={value} className="value-pop text-4xl font-bold tabular-nums" style={{ color: 'var(--player-accent)' }}>{value}</div>
       <div className="flex w-full gap-2">
         <button aria-label="-1" onClick={onDec} disabled={value <= 0}
           className="flex-1 rounded-lg py-3 text-lg font-bold active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"

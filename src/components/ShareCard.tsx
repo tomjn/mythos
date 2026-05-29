@@ -20,7 +20,7 @@ export function ShareCard() {
           bgColor="#ffffff"
           fgColor="#16306b"
           marginSize={1}
-          imageSettings={{ src: `${import.meta.env.BASE_URL}icon.svg`, height: 42, width: 42, excavate: true }}
+          imageSettings={{ src: `${import.meta.env.BASE_URL}swirl.svg`, height: 44, width: 44, excavate: true }}
         />
       </div>
       <a

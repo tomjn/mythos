@@ -23,7 +23,7 @@ export function SettingsScreen() {
 
       <div className="space-y-2">
         <Label htmlFor="start">Minutes per player (min 15)</Label>
-        <div className="flex gap-2">
+        <div className="flex gap-4">
           <Input id="start" type="number" inputMode="numeric" min={15} value={minutes}
             onChange={(e) => setMinutes(e.target.value)} />
           <Button onClick={() => dispatch({ type: 'SET_START_TIME', ms: Math.max(MIN_START_MS, Number(minutes) * 60000) })}>
@@ -40,7 +40,7 @@ export function SettingsScreen() {
 
       <div className="space-y-2">
         <Label htmlFor="roundlen">Round length (minutes)</Label>
-        <div className="flex gap-2">
+        <div className="flex gap-4">
           <Input id="roundlen" type="number" inputMode="numeric" min={1} value={roundMinutes}
             onChange={(e) => setRoundMinutes(e.target.value)} />
           <Button onClick={() => dispatch({ type: 'SET_ROUND_DURATION', ms: Math.max(1, Number(roundMinutes)) * 60000 })}>
@@ -50,6 +50,18 @@ export function SettingsScreen() {
       </div>
 
       <Button variant="destructive" onClick={() => { dispatch({ type: 'NEW_MATCH' }); navigate('/') }}>New match</Button>
+
+      <footer className="mt-auto border-t border-slate-700/60 pt-4 text-center text-sm text-slate-400">
+        Found a bug or have a suggestion?{' '}
+        <a
+          href="https://github.com/tomjn/mythos/issues"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-slate-200 underline underline-offset-2 hover:text-white"
+        >
+          Open an issue on GitHub
+        </a>
+      </footer>
     </div>
   )
 }

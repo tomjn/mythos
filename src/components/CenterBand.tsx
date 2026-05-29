@@ -26,7 +26,10 @@ export function CenterBand() {
       </button>
 
       {match.roundTimer.enabled ? (
-        <span className="font-mono text-sm tabular-nums">{formatMs(roundMs)}</span>
+        <div className="flex items-center gap-1">
+          <span className="font-mono text-sm tabular-nums">{formatMs(roundMs)}</span>
+          <Link to="/settings" aria-label="Settings" className="p-1"><Settings size={16} /></Link>
+        </div>
       ) : (
         <Link to="/settings" aria-label="Settings" className="p-2"><Settings size={20} /></Link>
       )}

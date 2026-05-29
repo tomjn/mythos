@@ -43,4 +43,23 @@ describe('CenterBand', () => {
     )
     expect(screen.queryByTestId('round-timer')).toBeNull()
   })
+
+  it('keeps settings reachable when the round timer is enabled', () => {
+    localStorage.setItem('mythos-match-v1', JSON.stringify({
+      players: [
+        { name: 'Player 1', chakra: 5, mission: 0, clockMs: 1800000, timedOut: false },
+        { name: 'Player 2', chakra: 5, mission: 0, clockMs: 1800000, timedOut: false },
+      ],
+      active: null, activeSince: null, edge: null, paused: true,
+      roundTimer: { enabled: true, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
+      settings: { startMs: 1800000 },
+    }))
+    render(
+      <MemoryRouter>
+        <MatchProvider><CenterBand /></MatchProvider>
+      </MemoryRouter>,
+    )
+    expect(screen.getByTestId('round-timer')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /settings/i })).toBeInTheDocument()
+  })
 })

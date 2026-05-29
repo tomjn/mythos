@@ -23,4 +23,12 @@ describe('StatTile', () => {
     render(<StatTile label="MISSION" value={13} onInc={() => {}} onDec={() => {}} />)
     expect(screen.queryByRole('button', { name: /reset/i })).toBeNull()
   })
+  it('disables -1 at zero', () => {
+    render(<StatTile label="MISSION" value={0} onInc={() => {}} onDec={() => {}} />)
+    expect(screen.getByRole('button', { name: '-1' })).toBeDisabled()
+  })
+  it('enables -1 above zero', () => {
+    render(<StatTile label="MISSION" value={3} onInc={() => {}} onDec={() => {}} />)
+    expect(screen.getByRole('button', { name: '-1' })).toBeEnabled()
+  })
 })

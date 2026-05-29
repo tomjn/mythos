@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+# Mythos TCG Arena Counter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A two-player match counter for the Mythos trading card game, built for a phone
+laid flat between both players. The board renders right-side-up from both seats
+(the top panel is mirrored), and everything you need to track during a game lives
+on one screen.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Per-player chess clocks** — tap your half of the screen to end your turn and
+  start the opponent's clock. Minimum 15 minutes per player.
+- **Shared round timer** — an optional mode that replaces the chess clocks with a
+  single countdown shared by both players (default 25 minutes).
+- **Chakra and Mission counters** — per-player tallies with quick adjust and reset
+  (chakra resets to the game base of 5).
+- **Edge marker** — track which player currently holds the edge.
+- **Pause / resume and timeout** handling.
+- **Persistent state** — the current match is saved to `localStorage`, so a
+  refresh or accidental close won't lose the game.
+- **Screen stays awake** while a clock is running, via the Wake Lock API.
+- **Installable PWA** — add it to your home screen for a full-screen, app-like
+  experience.
 
-## React Compiler
+## Getting started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Then open the URL Vite prints (default <http://localhost:5173>).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Command            | Description                                  |
+| ------------------ | -------------------------------------------- |
+| `npm run dev`      | Start the Vite dev server with HMR           |
+| `npm run build`    | Type-check (`tsc -b`) and build for production |
+| `npm run preview`  | Preview the production build locally         |
+| `npm run lint`     | Run ESLint                                   |
+| `npm test`         | Run the test suite once (Vitest)             |
+| `npm run test:watch` | Run tests in watch mode                    |
+
+## Tech stack
+
+- **React 19** + **TypeScript**, bundled with **Vite**
+- **React Router** (HashRouter) for the match and settings screens
+- **Tailwind CSS** with **shadcn/ui** components built on **Radix UI**
+- **Vitest** + **Testing Library** for unit and component tests
+
+## Project structure
+
 ```
+src/
+  match/        Match state: types, reducer, timing, storage, formatting
+  screens/      MatchScreen and SettingsScreen
+  components/   PlayerPanel, CenterBand, clock/stat tiles, ui/ primitives
+  hooks/        useWakeLock
+```
+
+Match state is held in a reducer (`src/match/reducer.ts`) and shared through
+`MatchContext`. Clocks store remaining time relative to when they last started,
+so live values are derived on each tick rather than mutated — this keeps timers
+accurate across re-renders and `localStorage` restores.

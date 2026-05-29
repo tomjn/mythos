@@ -44,6 +44,16 @@ describe('CenterBand', () => {
     expect(screen.getByRole('link', { name: /settings/i })).toBeInTheDocument()
   })
 
+  it('shows a start hint instead of the play button before any clock starts', () => {
+    render(
+      <MemoryRouter>
+        <MatchProvider><CenterBand /></MatchProvider>
+      </MemoryRouter>,
+    )
+    expect(screen.getByText(/tap a side to start/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /resume|pause/i })).toBeNull()
+  })
+
   it('resume starts the shared round timer in round mode', async () => {
     localStorage.setItem('mythos-match-v1', JSON.stringify({
       players: [

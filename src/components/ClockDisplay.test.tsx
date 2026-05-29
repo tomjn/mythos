@@ -11,4 +11,16 @@ describe('ClockDisplay', () => {
     render(<ClockDisplay ms={0} timedOut />)
     expect(screen.getByTestId('clock')).toHaveAttribute('data-timedout', 'true')
   })
+  it('is normal with plenty of time left', () => {
+    render(<ClockDisplay ms={5 * 60 * 1000} timedOut={false} />)
+    expect(screen.getByTestId('clock')).toHaveAttribute('data-level', 'normal')
+  })
+  it('warns at or under two minutes', () => {
+    render(<ClockDisplay ms={90 * 1000} timedOut={false} />)
+    expect(screen.getByTestId('clock')).toHaveAttribute('data-level', 'warn')
+  })
+  it('is in danger at or under thirty seconds', () => {
+    render(<ClockDisplay ms={20 * 1000} timedOut={false} />)
+    expect(screen.getByTestId('clock')).toHaveAttribute('data-level', 'danger')
+  })
 })

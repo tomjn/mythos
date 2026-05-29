@@ -31,6 +31,7 @@ export function MatchProvider({ children }: { children: ReactNode }) {
     const id = setInterval(() => {
       const now = Date.now()
       if (liveClockMs(match, idx, now) <= 0) {
+        navigator.vibrate?.([300, 120, 300]) // buzz on time-out (Android; no-op where unsupported)
         dispatch({ type: 'TIMEOUT', player: idx, now })
       }
     }, TICK_MS)

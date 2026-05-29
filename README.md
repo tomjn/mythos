@@ -7,6 +7,10 @@ laid flat between both players. The board renders right-side-up from both seats
 (the top panel is mirrored), and everything you need to track during a game lives
 on one screen.
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="Mythos TCG Arena Counter — split-screen match view with per-player clocks, chakra and mission counters, and an edge marker" width="320" />
+</p>
+
 ## Features
 
 - **Per-player chess clocks** — tap your half of the screen to end your turn and

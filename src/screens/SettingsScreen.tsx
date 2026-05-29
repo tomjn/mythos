@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { ShareCard } from '@/components/ShareCard'
 import { MIN_START_MS } from '@/match/constants'
 
 export function SettingsScreen() {
@@ -50,6 +51,8 @@ export function SettingsScreen() {
       </div>
 
       <Button variant="destructive" onClick={() => { dispatch({ type: 'NEW_MATCH' }); navigate('/') }}>New match</Button>
+
+      <ShareCard />
 
       <footer className="mt-auto border-t border-slate-700/60 pt-4 text-center text-sm text-slate-400">
         Found a bug or have a suggestion?{' '}

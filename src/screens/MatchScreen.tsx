@@ -8,9 +8,9 @@ export function MatchScreen() {
   useWakeLock(!match.paused && (match.active != null || match.roundTimer.enabled))
   return (
     <div className="flex h-full flex-col gap-1 bg-neutral-900 p-1">
-      <div className="min-h-0 flex-1 overflow-hidden rounded-2xl"><PlayerPanel index={1} flipped /></div>
+      <div className="min-h-0 flex-1"><PlayerPanel index={1} flipped /></div>
       <CenterBand />
-      <div className="min-h-0 flex-1 overflow-hidden rounded-2xl"><PlayerPanel index={0} flipped={false} /></div>
+      <div className="min-h-0 flex-1"><PlayerPanel index={0} flipped={false} /></div>
     </div>
   )
 }

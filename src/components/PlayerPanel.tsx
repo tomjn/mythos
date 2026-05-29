@@ -19,7 +19,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
     <div
       data-flipped={flipped}
       data-running={isActive}
-      className={`theme-${index === 0 ? 'p1' : 'p2'} relative flex h-full flex-col transition-[opacity,box-shadow] duration-300 motion-reduce:transition-none`}
+      className={`theme-${index === 0 ? 'p1' : 'p2'} relative flex h-full flex-col overflow-hidden rounded-2xl transition-[opacity,box-shadow] duration-300 motion-reduce:transition-none`}
       style={{
         background: 'var(--player-bg)',
         color: 'var(--player-accent)',

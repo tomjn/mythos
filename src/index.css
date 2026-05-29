@@ -10,6 +10,14 @@ body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; 
 .theme-p1 { --player-bg: #5b1418; --player-surface: #7a1c22; --player-accent: #f59e42; --player-accent-fg: #3a0c0e; }
 .theme-p2 { --player-bg: #16306b; --player-surface: #1e3f86; --player-accent: #7fd4f5; --player-accent-fg: #0a1f44; }
 
+/* The split layout needs vertical room. The manifest locks orientation for
+   installed PWAs; for the browser (and iOS Safari, which can't lock), show a
+   rotate prompt only on short landscape viewports (i.e. a phone on its side). */
+.landscape-blocker { display: none; }
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-blocker { display: flex; }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

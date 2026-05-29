@@ -44,4 +44,25 @@ describe('PlayerPanel', () => {
     render(<MatchProvider><PlayerPanel index={0} flipped={false} /></MatchProvider>)
     expect(screen.getByTestId('tap-surface-0')).toBeDisabled()
   })
+
+  it('marks the panel as running when its clock is the active one', () => {
+    localStorage.setItem('mythos-match-v1', JSON.stringify({
+      players: [
+        { name: 'Player 1', chakra: 5, mission: 0, clockMs: 900000, timedOut: false },
+        { name: 'Player 2', chakra: 5, mission: 0, clockMs: 900000, timedOut: false },
+      ],
+      active: 0, activeSince: 1000, edge: null, paused: false,
+      roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
+      settings: { startMs: 900000 },
+    }))
+    const { container } = render(
+      <MatchProvider>
+        <PlayerPanel index={0} flipped={false} />
+        <PlayerPanel index={1} flipped />
+      </MatchProvider>,
+    )
+    const panels = container.querySelectorAll('[data-running]')
+    expect(panels[0]).toHaveAttribute('data-running', 'true')
+    expect(panels[1]).toHaveAttribute('data-running', 'false')
+  })
 })

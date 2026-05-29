@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { RotateCcw } from 'lucide-react'
 
 interface StatTileProps {
@@ -9,14 +10,20 @@ interface StatTileProps {
 }
 
 export function StatTile({ label, value, onInc, onDec, onReset }: StatTileProps) {
+  const [spinKey, setSpinKey] = useState(0)
+  const handleReset = () => {
+    setSpinKey((k) => k + 1)
+    onReset?.()
+  }
+
   return (
     <div className="flex flex-col items-center gap-2 p-3">
       <div className="flex items-center gap-2">
         <span className="text-xs font-semibold tracking-widest opacity-80">{label}</span>
         {onReset && (
-          <button aria-label={`Reset ${label}`} onClick={onReset}
-            className="opacity-70 transition-transform duration-200 active:-rotate-45 active:scale-90 active:opacity-100">
-            <RotateCcw size={16} />
+          <button aria-label={`Reset ${label}`} onClick={handleReset}
+            className="opacity-70 transition-transform duration-200 active:scale-90 active:opacity-100">
+            <RotateCcw key={spinKey} size={16} className={spinKey > 0 ? 'reset-spin' : undefined} />
           </button>
         )}
       </div>

@@ -27,6 +27,14 @@ body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; 
 }
 .value-pop { animation: value-pop 200ms cubic-bezier(0.22, 1, 0.36, 1); }
 
+/* Reset feedback: the rotate icon does one full turn when tapped (replayed via a
+   React key), regardless of how briefly the button is pressed. */
+@keyframes reset-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+.reset-spin { animation: reset-spin 350ms cubic-bezier(0.22, 1, 0.36, 1); }
+
 /* Honour reduced-motion: collapse every animation/transition to near-instant. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

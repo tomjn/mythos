@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useMatch } from '@/match/MatchContext'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { MIN_START_MS } from '@/match/constants'
 
 export function SettingsScreen() {
   const { match, dispatch } = useMatch()
+  const navigate = useNavigate()
   const [minutes, setMinutes] = useState(String(Math.round(match.settings.startMs / 60000)))
   const [roundMinutes, setRoundMinutes] = useState(String(Math.round(match.roundTimer.durationMs / 60000)))
 
@@ -48,7 +49,7 @@ export function SettingsScreen() {
         </div>
       </div>
 
-      <Button variant="destructive" onClick={() => dispatch({ type: 'NEW_MATCH' })}>New match</Button>
+      <Button variant="destructive" onClick={() => { dispatch({ type: 'NEW_MATCH' }); navigate('/') }}>New match</Button>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { MatchProvider, useMatch } from '@/match/MatchContext'
 import { SettingsScreen } from './SettingsScreen'
 
@@ -35,5 +35,21 @@ describe('SettingsScreen', () => {
     const sw = screen.getByRole('switch', { name: /round timer/i })
     await userEvent.click(sw)
     expect(sw).toBeChecked()
+  })
+
+  it('returns to the match screen when New match is pressed', async () => {
+    render(
+      <MemoryRouter initialEntries={['/settings']}>
+        <MatchProvider>
+          <Routes>
+            <Route path="/" element={<div>match screen</div>} />
+            <Route path="/settings" element={<SettingsScreen />} />
+          </Routes>
+        </MatchProvider>
+      </MemoryRouter>,
+    )
+    expect(screen.queryByText('match screen')).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: /new match/i }))
+    expect(screen.getByText('match screen')).toBeInTheDocument()
   })
 })

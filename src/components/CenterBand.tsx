@@ -15,7 +15,7 @@ export function CenterBand() {
   const idle = !match.roundTimer.enabled && match.active == null
 
   return (
-    <div className="flex items-center justify-between gap-4 bg-neutral-900 px-4 py-1 text-neutral-200">
+    <div className="flex min-h-11 items-center justify-between gap-4 bg-neutral-900 px-4 text-neutral-200">
       <span className="w-10" />
       {idle ? (
         <span className="text-xs font-medium uppercase tracking-wide text-neutral-400">Tap a side to start</span>
@@ -24,7 +24,7 @@ export function CenterBand() {
           {match.paused ? <Play size={20} /> : <Pause size={20} />}
         </button>
       )}
-      <Link to="/settings" aria-label="Settings" className="p-2"><Settings size={20} /></Link>
+      <Link to="/settings" aria-label="Settings" className="flex items-center self-stretch px-3"><Settings size={20} /></Link>
     </div>
   )
 }

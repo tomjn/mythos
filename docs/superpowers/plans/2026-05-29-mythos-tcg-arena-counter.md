@@ -129,9 +129,11 @@ export default {
 html, body, #root { height: 100%; margin: 0; }
 body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
 
-/* Per-player theme tokens (consumed via inline style or data attributes) */
-.theme-p1 { --bg: #5b1418; --surface: #7a1c22; --accent: #f59e42; --accent-fg: #3a0c0e; }
-.theme-p2 { --bg: #16306b; --surface: #1e3f86; --accent: #7fd4f5; --accent-fg: #0a1f44; }
+/* Per-player theme tokens (consumed via inline style or data attributes).
+   Namespaced with --player-* to avoid colliding with shadcn's own
+   --accent / --background CSS variables. */
+.theme-p1 { --player-bg: #5b1418; --player-surface: #7a1c22; --player-accent: #f59e42; --player-accent-fg: #3a0c0e; }
+.theme-p2 { --player-bg: #16306b; --player-surface: #1e3f86; --player-accent: #7fd4f5; --player-accent-fg: #0a1f44; }
 ```
 
 - [ ] **Step 8: Init shadcn and add primitives**
@@ -635,7 +637,7 @@ git commit -m "Add reducer clock actions with timestamp settling"
 - [ ] **Step 1: Append failing tests** to `src/match/reducer.test.ts`:
 
 ```ts
-import { MIN_START_MS as MIN, BASE_CHAKRA, DEFAULT_ROUND_MS } from './constants'
+import { BASE_CHAKRA } from './constants'
 
 describe('reducer counters & toggles', () => {
   it('ADJUST_CHAKRA clamps at zero', () => {
@@ -664,9 +666,9 @@ describe('reducer counters & toggles', () => {
   it('SET_START_TIME enforces floor and resets both clocks', () => {
     let m = matchReducer(fresh(), { type: 'TAP_HALF', player: 0, now: 0 })
     m = matchReducer(m, { type: 'SET_START_TIME', ms: 10_000 })
-    expect(m.settings.startMs).toBe(MIN)
-    expect(m.players[0].clockMs).toBe(MIN)
-    expect(m.players[1].clockMs).toBe(MIN)
+    expect(m.settings.startMs).toBe(MIN_START_MS)
+    expect(m.players[0].clockMs).toBe(MIN_START_MS)
+    expect(m.players[1].clockMs).toBe(MIN_START_MS)
     expect(m.active).toBeNull()
     expect(m.paused).toBe(true)
   })
@@ -743,9 +745,10 @@ Expected: FAIL (new cases fall through `default` and return unchanged state).
     }
 ```
 
-Add the imports at the top of `reducer.ts`:
+Ensure these imports are present at the top of `reducer.ts` (Task 6 removed the `createInitialMatch` import as unused; NEW_MATCH needs it back):
 
 ```ts
+import { createInitialMatch } from './state'
 import { BASE_CHAKRA, MIN_START_MS } from './constants'
 ```
 
@@ -1108,7 +1111,7 @@ export function ClockDisplay({ ms, timedOut }: { ms: number; timedOut: boolean }
       data-testid="clock"
       data-timedout={timedOut}
       className="text-center font-mono font-bold tabular-nums leading-none data-[timedout=true]:animate-pulse"
-      style={{ fontSize: 'clamp(3rem, 14vw, 6rem)', color: 'var(--accent)' }}
+      style={{ fontSize: 'clamp(3rem, 14vw, 6rem)', color: 'var(--player-accent)' }}
     >
       {formatMs(ms)}
     </div>
@@ -1200,19 +1203,19 @@ export function StatTile({ label, value, onInc, onDec, preset, onPreset, onReset
           </button>
         )}
       </div>
-      <div className="text-4xl font-bold tabular-nums" style={{ color: 'var(--accent)' }}>{value}</div>
+      <div className="text-4xl font-bold tabular-nums" style={{ color: 'var(--player-accent)' }}>{value}</div>
       <div className="flex w-full gap-2">
         <button aria-label="-1" onClick={onDec}
           className="flex-1 rounded-lg py-3 text-lg font-bold active:scale-95"
-          style={{ background: 'var(--surface)' }}>-1</button>
+          style={{ background: 'var(--player-surface)' }}>-1</button>
         {preset != null && onPreset && (
           <button aria-label={`+${preset}`} onClick={onPreset}
             className="flex-1 rounded-lg py-3 text-lg font-bold active:scale-95"
-            style={{ background: 'var(--surface)' }}>+{preset}</button>
+            style={{ background: 'var(--player-surface)' }}>+{preset}</button>
         )}
         <button aria-label="+1" onClick={onInc}
           className="flex-1 rounded-lg py-3 text-lg font-bold active:scale-95"
-          style={{ background: 'var(--accent)', color: 'var(--accent-fg)' }}>+1</button>
+          style={{ background: 'var(--player-accent)', color: 'var(--player-accent-fg)' }}>+1</button>
       </div>
     </div>
   )
@@ -1275,8 +1278,8 @@ export function EdgePill({ active, onToggle }: { active: boolean; onToggle: () =
       className="rounded-full border-2 px-5 py-1.5 text-sm font-bold transition-colors"
       style={
         active
-          ? { background: 'var(--accent)', color: 'var(--accent-fg)', borderColor: 'var(--accent)' }
-          : { background: 'transparent', color: 'var(--accent)', borderColor: 'var(--accent)' }
+          ? { background: 'var(--player-accent)', color: 'var(--player-accent-fg)', borderColor: 'var(--player-accent)' }
+          : { background: 'transparent', color: 'var(--player-accent)', borderColor: 'var(--player-accent)' }
       }
     >
       Edge
@@ -1371,7 +1374,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
     <div
       data-flipped={flipped}
       className={`theme-${index === 0 ? 'p1' : 'p2'} relative flex h-full flex-col`}
-      style={{ background: 'var(--bg)', color: 'var(--accent)', transform: flipped ? 'rotate(180deg)' : undefined }}
+      style={{ background: 'var(--player-bg)', color: 'var(--player-accent)', transform: flipped ? 'rotate(180deg)' : undefined }}
     >
       <div className="flex items-center justify-between px-4 pt-3">
         <span className="text-lg font-bold">{player.name}</span>
@@ -1442,24 +1445,34 @@ import { CenterBand } from './CenterBand'
 
 beforeEach(() => localStorage.clear())
 
-function PausedProbe() {
-  const { match } = useMatch()
-  return <span data-testid="paused">{String(match.paused)}</span>
+function Controls() {
+  const { match, dispatch } = useMatch()
+  return (
+    <>
+      <span data-testid="paused">{String(match.paused)}</span>
+      <button onClick={() => dispatch({ type: 'TAP_HALF', player: 0, now: Date.now() })}>start</button>
+    </>
+  )
 }
 
 describe('CenterBand', () => {
-  it('toggles pause/resume', async () => {
+  // A match begins by tapping a player's half (sets the active player and unpauses);
+  // the centre control then pauses/resumes the in-progress match. RESUME is a no-op
+  // from the fresh idle state by design, so we start the match first.
+  it('pauses and resumes a running match', async () => {
     render(
       <MemoryRouter>
         <MatchProvider>
           <CenterBand />
-          <PausedProbe />
+          <Controls />
         </MatchProvider>
       </MemoryRouter>,
     )
-    // starts paused -> shows Resume affordance; clicking pause control toggles
-    const toggle = screen.getByRole('button', { name: /pause|resume/i })
-    await userEvent.click(toggle)
+    await userEvent.click(screen.getByText('start'))
+    expect(screen.getByTestId('paused').textContent).toBe('false')
+    await userEvent.click(screen.getByRole('button', { name: /pause/i }))
+    expect(screen.getByTestId('paused').textContent).toBe('true')
+    await userEvent.click(screen.getByRole('button', { name: /resume/i }))
     expect(screen.getByTestId('paused').textContent).toBe('false')
   })
 
@@ -1510,7 +1523,10 @@ export function CenterBand() {
       </button>
 
       {match.roundTimer.enabled ? (
-        <span className="font-mono text-sm tabular-nums">{formatMs(roundMs)}</span>
+        <div className="flex items-center gap-1">
+          <span className="font-mono text-sm tabular-nums">{formatMs(roundMs)}</span>
+          <Link to="/settings" aria-label="Settings" className="p-1"><Settings size={16} /></Link>
+        </div>
       ) : (
         <Link to="/settings" aria-label="Settings" className="p-2"><Settings size={20} /></Link>
       )}
@@ -1519,7 +1535,7 @@ export function CenterBand() {
 }
 ```
 
-> Note: when the round timer is enabled the settings gear moves into the Settings screen's own nav; the band keeps a mirrored round timer on both ends so each player reads it upright. When disabled, the right slot holds the settings gear. The Settings screen is always reachable from the round timer's adjacent gear (added in Task 17) — verify the gear is reachable in at least one state during manual testing.
+> Note: the right (upright, player-1-facing) slot ALWAYS contains the Settings gear so settings are reachable in every state. When the round timer is enabled, the gear sits next to the upright round-time readout; the left slot shows the mirrored (rotate-180) round-time for the opposite player. This avoids a settings trap where enabling the round timer would otherwise hide the only path to `#/settings`.
 
 - [ ] **Step 4: Run test to verify it passes**
 

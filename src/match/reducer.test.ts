@@ -7,23 +7,24 @@ import { MIN_START_MS, BASE_CHAKRA } from './constants'
 const fresh = () => createInitialMatch(MIN_START_MS)
 
 describe('reducer clock actions', () => {
-  it('TAP_HALF starts the OTHER player and runs the clock', () => {
+  it('the first tap starts the tapped player and runs the clock', () => {
     const m = matchReducer(fresh(), { type: 'TAP_HALF', player: 0, now: 1000 })
-    expect(m.active).toBe(1)
+    expect(m.active).toBe(0)
     expect(m.paused).toBe(false)
     expect(m.activeSince).toBe(1000)
   })
 
-  it('tapping the active player again folds elapsed and passes back', () => {
-    let m = matchReducer(fresh(), { type: 'TAP_HALF', player: 0, now: 0 }) // P1 active
-    m = matchReducer(m, { type: 'TAP_HALF', player: 1, now: 5000 }) // P1 taps -> P0 active
+  it('once running, tapping a side folds elapsed and passes to the opponent', () => {
+    let m = matchReducer(fresh(), { type: 'TAP_HALF', player: 0, now: 0 }) // P1 (index 0) starts
     expect(m.active).toBe(0)
-    expect(m.players[1].clockMs).toBe(MIN_START_MS - 5000) // P1's spent time folded
+    m = matchReducer(m, { type: 'TAP_HALF', player: 0, now: 5000 }) // P1 ends turn -> P2
+    expect(m.active).toBe(1)
+    expect(m.players[0].clockMs).toBe(MIN_START_MS - 5000) // P1's spent time folded
     expect(m.activeSince).toBe(5000)
   })
 
   it('PAUSE folds elapsed and stops; RESUME continues the same player', () => {
-    let m = matchReducer(fresh(), { type: 'TAP_HALF', player: 1, now: 0 }) // P0 active
+    let m = matchReducer(fresh(), { type: 'TAP_HALF', player: 0, now: 0 }) // P1 (index 0) starts
     m = matchReducer(m, { type: 'PAUSE', now: 4000 })
     expect(m.paused).toBe(true)
     expect(m.activeSince).toBeNull()
@@ -35,7 +36,7 @@ describe('reducer clock actions', () => {
   })
 
   it('TIMEOUT clamps the player to zero, flags them, stops their clock', () => {
-    let m = matchReducer(fresh(), { type: 'TAP_HALF', player: 1, now: 0 }) // P0 active
+    let m = matchReducer(fresh(), { type: 'TAP_HALF', player: 0, now: 0 }) // P1 (index 0) running
     m = matchReducer(m, { type: 'TIMEOUT', player: 0, now: MIN_START_MS + 1000 })
     expect(m.players[0].clockMs).toBe(0)
     expect(m.players[0].timedOut).toBe(true)

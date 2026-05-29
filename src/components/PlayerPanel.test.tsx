@@ -20,7 +20,7 @@ describe('PlayerPanel', () => {
     expect(container.querySelector('[data-flipped="true"]')).not.toBeNull()
   })
 
-  it('tapping the half passes the clock to the opponent', async () => {
+  it('the first tap starts the tapped player', async () => {
     render(
       <MatchProvider>
         <PlayerPanel index={0} flipped={false} />
@@ -28,7 +28,7 @@ describe('PlayerPanel', () => {
       </MatchProvider>,
     )
     await userEvent.click(screen.getByTestId('tap-surface-0'))
-    expect(screen.getByTestId('active').textContent).toBe('1')
+    expect(screen.getByTestId('active').textContent).toBe('0')
   })
 
   it('disables tap-to-pass when the round timer is enabled', () => {

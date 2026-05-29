@@ -34,7 +34,10 @@ export function matchReducer(m: Match, action: MatchAction): Match {
   switch (action.type) {
     case 'TAP_HALF': {
       const settled = settle(m, action.now)
-      const next: PlayerIndex = action.player === 0 ? 1 : 0
+      // First tap of a match (nothing running yet) starts the tapped player's
+      // own clock; once a clock is running, tapping a side ends that turn and
+      // hands the clock to the opponent.
+      const next: PlayerIndex = settled.active == null ? action.player : action.player === 0 ? 1 : 0
       return { ...settled, paused: false, active: next, activeSince: action.now,
         roundSince: settled.roundTimer.enabled ? action.now : null }
     }

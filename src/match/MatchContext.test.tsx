@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { render, renderHook, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MatchProvider, useMatch } from './MatchContext'
+import { MatchProvider, useMatch, useNow } from './MatchContext'
 
 function Probe() {
   const { match, dispatch } = useMatch()
@@ -37,5 +37,22 @@ describe('MatchProvider', () => {
     localStorage.setItem('mythos-match-v1', stored)
     render(<MatchProvider><Probe /></MatchProvider>)
     expect(screen.getByTestId('edge').textContent).toBe('1')
+  })
+})
+
+describe('useNow', () => {
+  afterEach(() => vi.useRealTimers())
+
+  // Regression: a panel that becomes active must show the current time
+  // immediately, not a stale timestamp from when it last stopped. So useNow
+  // must reflect the current time on every render, not only on its own interval.
+  it('returns the current time fresh on every render', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
+    const { result, rerender } = renderHook(({ r }) => useNow(r), { initialProps: { r: false } })
+    expect(result.current).toBe(1000)
+    vi.setSystemTime(60000)
+    rerender({ r: false })
+    expect(result.current).toBe(60000)
   })
 })

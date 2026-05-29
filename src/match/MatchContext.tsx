@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer, useRef, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react'
 import type { Match, MatchAction, PlayerIndex } from './types'
 import { matchReducer } from './reducer'
 import { createInitialMatch } from './state'
@@ -46,17 +46,19 @@ export function useMatch(): MatchContextValue {
   return ctx
 }
 
-/** Re-renders the caller every TICK_MS while running, returning a live `now`. */
+/**
+ * Returns the current time, read fresh on every render so a panel that just
+ * became active reflects the correct time immediately (no stale jump). While
+ * `running`, an interval forces a re-render every TICK_MS so the clock advances.
+ */
 export function useNow(running: boolean): number {
-  const [now, setNow] = useState(() => Date.now())
-  const ref = useRef(running)
-  ref.current = running
+  const [, forceTick] = useReducer((n: number) => n + 1, 0)
   useEffect(() => {
-    if (!running) { setNow(Date.now()); return }
-    const id = setInterval(() => setNow(Date.now()), TICK_MS)
+    if (!running) return
+    const id = setInterval(forceTick, TICK_MS)
     return () => clearInterval(id)
   }, [running])
-  return now
+  return Date.now()
 }
 
 export type { PlayerIndex }

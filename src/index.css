@@ -10,12 +10,15 @@ body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; 
 .theme-p1 { --player-bg: #5b1418; --player-surface: #7a1c22; --player-accent: #f59e42; --player-accent-fg: #3a0c0e; }
 .theme-p2 { --player-bg: #16306b; --player-surface: #1e3f86; --player-accent: #7fd4f5; --player-accent-fg: #0a1f44; }
 
-/* The split layout needs vertical room. The manifest locks orientation for
-   installed PWAs; for the browser (and iOS Safari, which can't lock), show a
-   rotate prompt only on short landscape viewports (i.e. a phone on its side). */
-.landscape-blocker { display: none; }
-@media (orientation: landscape) and (max-height: 500px) {
-  .landscape-blocker { display: flex; }
+/* Pointer hover affordance: a faint light overlay on hover. Gated behind
+   `hover: hover` so touch devices (where a tap would otherwise leave a stuck
+   hover state) never get it. The inset box-shadow composites over whatever
+   inline background a button already has, so it works on filled and ghost
+   buttons alike. Skipped on disabled controls. */
+@media (hover: hover) {
+  .hover-lift:hover:not(:disabled) {
+    box-shadow: inset 0 0 0 999px rgba(255, 255, 255, 0.1);
+  }
 }
 
 /* Counter feedback: the number settles in from slightly larger when it changes,

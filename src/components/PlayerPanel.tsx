@@ -19,12 +19,14 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
     <div
       data-flipped={flipped}
       data-running={isActive}
-      className={`theme-${index === 0 ? 'p1' : 'p2'} relative flex h-full flex-col overflow-hidden rounded-2xl transition-[opacity,box-shadow] duration-300 motion-reduce:transition-none`}
+      className={`theme-${index === 0 ? 'p1' : 'p2'} relative flex h-full flex-col overflow-hidden rounded-2xl transition-[background-color,box-shadow] duration-300 motion-reduce:transition-none`}
       style={{
-        background: 'var(--player-bg)',
+        // Only the base fill dims while waiting — the clock, counters and every
+        // button keep their own full-strength colours so the opponent can still
+        // read (and adjust) the other half at any time.
+        background: isWaiting ? 'color-mix(in srgb, var(--player-bg) 30%, #171717)' : 'var(--player-bg)',
         color: 'var(--player-accent)',
         transform: flipped ? 'rotate(180deg)' : undefined,
-        opacity: isWaiting ? 0.4 : 1,
         boxShadow: isActive ? 'inset 0 0 0 4px var(--player-accent)' : 'inset 0 0 0 0 transparent',
       }}
     >

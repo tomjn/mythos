@@ -4,7 +4,7 @@ export function EdgePill({ active, onToggle }: { active: boolean; onToggle: () =
       aria-label="Edge"
       data-active={active}
       onClick={onToggle}
-      className="rounded-full border-2 px-5 py-1.5 text-sm font-bold transition-[transform,background-color,border-color,color] duration-200 active:scale-95"
+      className="hover-lift rounded-full border-2 px-5 py-1.5 text-sm font-bold transition-[transform,background-color,border-color,color] duration-200 active:scale-95"
       style={
         active
           ? { background: 'var(--player-accent)', color: 'var(--player-accent-fg)', borderColor: 'var(--player-accent)' }

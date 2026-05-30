@@ -41,6 +41,9 @@ export function MatchProvider({ children }: { children: ReactNode }) {
   return <MatchContext.Provider value={{ match, dispatch }}>{children}</MatchContext.Provider>
 }
 
+// Hooks live with their provider by design; the only cost is that editing this
+// file does a full HMR reload instead of fast-refresh, which is fine here.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useMatch(): MatchContextValue {
   const ctx = useContext(MatchContext)
   if (!ctx) throw new Error('useMatch must be used within MatchProvider')
@@ -52,6 +55,7 @@ export function useMatch(): MatchContextValue {
  * became active reflects the correct time immediately (no stale jump). While
  * `running`, an interval forces a re-render every TICK_MS so the clock advances.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useNow(running: boolean): number {
   const [, forceTick] = useReducer((n: number) => n + 1, 0)
   useEffect(() => {
@@ -59,6 +63,9 @@ export function useNow(running: boolean): number {
     const id = setInterval(forceTick, TICK_MS)
     return () => clearInterval(id)
   }, [running])
+  // Reading the clock fresh on every render is the whole point of this hook (see
+  // above), so the impurity is intentional and covered by MatchContext.test.tsx.
+  // eslint-disable-next-line react-hooks/purity
   return Date.now()
 }
 

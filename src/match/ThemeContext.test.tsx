@@ -10,7 +10,7 @@ function Probe() {
   return (
     <>
       <span data-testid="id">{theme.id}</span>
-      <button onClick={() => setTheme('mono')}>pick mono</button>
+      <button type="button" onClick={() => setTheme('mono')}>pick mono</button>
     </>
   )
 }

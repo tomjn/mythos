@@ -47,6 +47,13 @@ describe('panelVars (filled / dim theme)', () => {
     expect(v['--player-bg']).toContain('#171717')
     expect(v['--player-accent']).toBe('#f59e42') // ink unchanged
   })
+
+  it('neutral half renders the same as active (full colour, no dim)', () => {
+    const neutral = panelVars(naruto, 0, 'neutral')
+    const active = panelVars(naruto, 0, 'active')
+    expect(neutral['--player-bg']).toBe(active['--player-bg'])
+    expect(neutral['--player-bg']).toBe('#5b1418')
+  })
 })
 
 describe('panelVars (outline / invert theme)', () => {
@@ -66,6 +73,14 @@ describe('panelVars (outline / invert theme)', () => {
     expect(v['--player-bg']).toBe('#000000')
     expect(v['--player-accent']).toBe('#ffffff')
     expect(v['--btn-plus-border']).toBe('#ffffff')
+  })
+
+  it('neutral half renders the swapped resting look (same as waiting)', () => {
+    const neutral = panelVars(mono, 0, 'neutral')
+    const waiting = panelVars(mono, 0, 'waiting')
+    expect(neutral['--player-bg']).toBe(waiting['--player-bg'])
+    expect(neutral['--player-bg']).toBe('#000000')
+    expect(neutral['--player-accent']).toBe('#ffffff')
   })
 
   it('exposes the theme warn/danger colours', () => {

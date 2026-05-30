@@ -125,12 +125,13 @@ export function panelVars(theme: Theme, player: PlayerIndex, state: PanelState):
       bg = half.bg
       ink = half.ink
     } else {
+      // waiting AND neutral use the swapped resting look
       bg = half.ink
       ink = half.bg
     }
   } else {
     ink = half.ink
-    bg = state === 'waiting' ? `color-mix(in srgb, ${half.bg} 35%, ${theme.backdrop})` : half.bg
+    bg = state === 'waiting' ? `color-mix(in srgb, ${half.bg} 35%, ${theme.backdrop})` : half.bg // neutral falls through to full colour, same as active
   }
 
   const filled = theme.buttons === 'filled'

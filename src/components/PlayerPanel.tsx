@@ -36,6 +36,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
       </div>
 
       <button
+        type="button"
         data-testid={`tap-surface-${index}`}
         aria-label={roundMode ? 'Shared round timer running' : match.active == null ? `Start ${player.name}'s clock` : `Pass clock from ${player.name}`}
         onClick={roundMode ? undefined : () => dispatch({ type: 'TAP_HALF', player: index, now: Date.now() })}

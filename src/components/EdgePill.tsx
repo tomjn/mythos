@@ -1,6 +1,7 @@
 export function EdgePill({ active, onToggle }: { active: boolean; onToggle: () => void }) {
   return (
     <button
+      type="button"
       aria-label="Edge"
       data-active={active}
       onClick={onToggle}

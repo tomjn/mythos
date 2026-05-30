@@ -22,7 +22,7 @@ export function CenterBand({ vertical = false }: { vertical?: boolean }) {
       Tap a side to start
     </span>
   ) : (
-    <button aria-label={match.paused ? 'Resume' : 'Pause'} onClick={toggle} className="hover-lift rounded-full bg-neutral-700 p-2 active:scale-95">
+    <button type="button" aria-label={match.paused ? 'Resume' : 'Pause'} onClick={toggle} className="hover-lift rounded-full bg-neutral-700 p-2 active:scale-95">
       {match.paused ? <Play size={20} /> : <Pause size={20} />}
     </button>
   )

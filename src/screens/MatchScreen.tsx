@@ -1,17 +1,20 @@
 import { PlayerPanel } from '@/components/PlayerPanel'
 import { CenterBand } from '@/components/CenterBand'
 import { useMatch } from '@/match/MatchContext'
+import { useTheme } from '@/match/ThemeContext'
 import { useWakeLock } from '@/hooks/useWakeLock'
 import { useSplitLayout } from '@/hooks/useSplitLayout'
 
 export function MatchScreen() {
   const { match } = useMatch()
+  const { theme } = useTheme()
   const split = useSplitLayout()
   useWakeLock(!match.paused && (match.active != null || match.roundTimer.enabled))
   return (
     <div
-      className={`flex h-full gap-1 bg-neutral-900 ${split ? 'flex-row' : 'flex-col'}`}
+      className={`flex h-full gap-1 ${split ? 'flex-row' : 'flex-col'}`}
       style={{
+        backgroundColor: theme.backdrop,
         // 4px frame, expanded to the device safe-area insets (iOS home indicator
         // and rounded display corners). env() is 0 on Android/desktop.
         paddingTop: 'max(4px, env(safe-area-inset-top))',

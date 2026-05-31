@@ -6,9 +6,6 @@
 html, body, #root { height: 100%; margin: 0; }
 body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
 
-/* Per-player theme tokens (consumed via inline style or data attributes) */
-.theme-p1 { --player-bg: #5b1418; --player-surface: #7a1c22; --player-accent: #f59e42; --player-accent-fg: #3a0c0e; }
-.theme-p2 { --player-bg: #16306b; --player-surface: #1e3f86; --player-accent: #7fd4f5; --player-accent-fg: #0a1f44; }
 
 /* Pointer hover affordance: a faint light overlay on hover. Gated behind
    `hover: hover` so touch devices (where a tap would otherwise leave a stuck

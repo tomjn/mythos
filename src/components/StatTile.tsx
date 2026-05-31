@@ -30,11 +30,11 @@ export function StatTile({ label, value, onInc, onDec, onReset }: StatTileProps)
       <div key={value} className="value-pop text-4xl font-bold tabular-nums" style={{ color: 'var(--player-accent)' }}>{value}</div>
       <div className="flex w-full gap-2">
         <button type="button" aria-label="-1" onClick={onDec} disabled={value <= 0}
-          className="hover-lift flex-1 rounded-lg py-3 text-lg font-bold active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
-          style={{ background: 'var(--player-surface)' }}>-1</button>
+          className="hover-lift flex-1 rounded-lg border-2 py-3 text-lg font-bold active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
+          style={{ background: 'var(--btn-minus-fill)', borderColor: 'var(--btn-minus-border)', color: 'var(--btn-minus-ink)' }}>-1</button>
         <button type="button" aria-label="+1" onClick={onInc}
-          className="hover-lift flex-1 rounded-lg py-3 text-lg font-bold active:scale-95"
-          style={{ background: 'var(--player-accent)', color: 'var(--player-accent-fg)' }}>+1</button>
+          className="hover-lift flex-1 rounded-lg border-2 py-3 text-lg font-bold active:scale-95"
+          style={{ background: 'var(--btn-plus-fill)', borderColor: 'var(--btn-plus-border)', color: 'var(--btn-plus-ink)' }}>+1</button>
       </div>
     </div>
   )

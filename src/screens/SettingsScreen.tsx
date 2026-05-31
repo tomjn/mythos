@@ -19,7 +19,7 @@ export function SettingsScreen() {
   const { themeId, setTheme } = useTheme()
 
   return (
-    <div className="flex min-h-full w-full flex-col gap-6 bg-slate-900 p-6 text-slate-100">
+    <div className="page-in flex min-h-full w-full flex-col gap-6 bg-slate-900 p-6 text-slate-100">
       <div className="flex items-center gap-3">
         <Link to="/" aria-label="Back to match"><ArrowLeft /></Link>
         <h1 className="text-xl font-bold">Settings</h1>

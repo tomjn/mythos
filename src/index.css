@@ -35,6 +35,28 @@ body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; 
 }
 .reset-spin { animation: reset-spin 350ms cubic-bezier(0.22, 1, 0.36, 1); }
 
+/* Match entrance/exit: the two player halves slide in from their own outer edge to
+   meet in the centre, and reverse back out when Settings opens. Direction is set
+   per-side via --side-from-* inline so one keyframe pair covers both orientations. */
+@keyframes side-in {
+  from { opacity: 0; transform: translate(var(--side-from-x, 0), var(--side-from-y, 0)); }
+  to   { opacity: 1; transform: translate(0, 0); }
+}
+@keyframes side-out {
+  from { opacity: 1; transform: translate(0, 0); }
+  to   { opacity: 0; transform: translate(var(--side-from-x, 0), var(--side-from-y, 0)); }
+}
+.side-in  { animation: side-in  500ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.side-out { animation: side-out 250ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Settings entrance: a soft fade + small rise so it eases in after the match slides
+   out, rather than snapping into place. */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-in { animation: page-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
 /* Honour reduced-motion: collapse every animation/transition to near-instant. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

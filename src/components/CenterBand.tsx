@@ -3,7 +3,7 @@ import { Pause, Play, Settings } from 'lucide-react'
 import { useMatch } from '@/match/MatchContext'
 import { useTheme } from '@/match/ThemeContext'
 
-export function CenterBand({ vertical = false }: { vertical?: boolean }) {
+export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }: { vertical?: boolean; onOpenSettings?: () => void; animClass?: string }) {
   const { match, dispatch } = useMatch()
   const { theme } = useTheme()
   const chrome = { backgroundColor: theme.chrome.bg, color: theme.chrome.ink }
@@ -36,18 +36,20 @@ export function CenterBand({ vertical = false }: { vertical?: boolean }) {
   // pause/start control centred below it). Horizontal: the original band.
   if (vertical) {
     return (
-      <div className="flex min-w-11 flex-col items-center gap-4 px-1 py-4" style={chrome}>
-        <Link to="/settings" aria-label="Settings" className="hover-lift rounded-lg p-2"><Settings size={20} /></Link>
+      <div className={`flex min-w-11 flex-col items-center gap-4 px-1 py-4 ${animClass}`} style={chrome}>
+        <Link to="/settings" aria-label="Settings" className="hover-lift rounded-lg p-2"
+          onClick={(e) => { if (onOpenSettings) { e.preventDefault(); onOpenSettings() } }}><Settings size={20} /></Link>
         <div className="flex flex-1 items-center">{control}</div>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-11 items-center justify-between gap-4 px-4" style={chrome}>
+    <div className={`flex min-h-11 items-center justify-between gap-4 px-4 ${animClass}`} style={chrome}>
       <span className="w-10" />
       {control}
-      <Link to="/settings" aria-label="Settings" className="hover-lift flex items-center self-stretch rounded-lg px-3"><Settings size={20} /></Link>
+      <Link to="/settings" aria-label="Settings" className="hover-lift flex items-center self-stretch rounded-lg px-3"
+        onClick={(e) => { if (onOpenSettings) { e.preventDefault(); onOpenSettings() } }}><Settings size={20} /></Link>
     </div>
   )
 }

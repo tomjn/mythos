@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useMatch } from '@/match/MatchContext'
+import { useTheme } from '@/match/ThemeContext'
+import { THEMES } from '@/match/themes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,6 +16,7 @@ export function SettingsScreen() {
   const navigate = useNavigate()
   const [minutes, setMinutes] = useState(String(Math.round(match.settings.startMs / 60000)))
   const [roundMinutes, setRoundMinutes] = useState(String(Math.round(match.roundTimer.durationMs / 60000)))
+  const { themeId, setTheme } = useTheme()
 
   return (
     <div className="flex min-h-full w-full flex-col gap-6 bg-slate-900 p-6 text-slate-100">
@@ -47,6 +50,34 @@ export function SettingsScreen() {
           <Button onClick={() => dispatch({ type: 'SET_ROUND_DURATION', ms: Math.max(1, Number(roundMinutes)) * 60000 })}>
             Apply round
           </Button>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Appearance</Label>
+        <div role="radiogroup" aria-label="Theme" className="flex flex-col gap-2">
+          {THEMES.map((t) => {
+            const selected = t.id === themeId
+            return (
+              <button
+                key={t.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                aria-label={t.label}
+                onClick={() => setTheme(t.id)}
+                className={`flex items-center justify-between rounded-lg border px-3 py-2 text-left transition-colors ${
+                  selected ? 'border-slate-100 bg-slate-800' : 'border-slate-700 hover:bg-slate-800/60'
+                }`}
+              >
+                <span className="font-medium">{t.label}</span>
+                <span className="flex gap-1" aria-hidden="true">
+                  <span className="h-5 w-5 rounded-full border border-black/20" style={{ background: t.players[0].bg }} />
+                  <span className="h-5 w-5 rounded-full border border-black/20" style={{ background: t.players[1].bg }} />
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
 

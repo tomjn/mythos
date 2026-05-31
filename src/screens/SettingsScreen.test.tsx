@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { MatchProvider, useMatch } from '@/match/MatchContext'
+import { ThemeProvider, useTheme } from '@/match/ThemeContext'
 import { SettingsScreen } from './SettingsScreen'
 
 beforeEach(() => localStorage.clear())
@@ -10,6 +11,11 @@ beforeEach(() => localStorage.clear())
 function StartProbe() {
   const { match } = useMatch()
   return <span data-testid="start">{match.settings.startMs}</span>
+}
+
+function ThemeProbe() {
+  const { theme } = useTheme()
+  return <span data-testid="theme">{theme.id}</span>
 }
 
 describe('SettingsScreen', () => {
@@ -35,6 +41,21 @@ describe('SettingsScreen', () => {
     const sw = screen.getByRole('switch', { name: /round timer/i })
     await userEvent.click(sw)
     expect(sw).toBeChecked()
+  })
+
+  it('selects a theme from the appearance picker', async () => {
+    localStorage.clear()
+    render(
+      <MemoryRouter>
+        <ThemeProvider>
+          <MatchProvider><SettingsScreen /><ThemeProbe /></MatchProvider>
+        </ThemeProvider>
+      </MemoryRouter>,
+    )
+    expect(screen.getByTestId('theme').textContent).toBe('naruto')
+    await userEvent.click(screen.getByRole('radio', { name: /monochrome/i }))
+    expect(screen.getByTestId('theme').textContent).toBe('mono')
+    expect(localStorage.getItem('mythos-theme-v1')).toBe('mono')
   })
 
   it('returns to the match screen when New match is pressed', async () => {

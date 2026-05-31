@@ -54,6 +54,13 @@ describe('panelVars (filled / dim theme)', () => {
     expect(neutral['--player-bg']).toBe(active['--player-bg'])
     expect(neutral['--player-bg']).toBe('#5b1418')
   })
+
+  it('resolves player index 1 from the correct palette slot', () => {
+    const v = panelVars(naruto, 1, 'active')
+    expect(v['--player-bg']).toBe('#16306b')
+    expect(v['--player-accent']).toBe('#7fd4f5')
+    expect(v['--btn-plus-fill']).toBe('#7fd4f5')
+  })
 })
 
 describe('panelVars (outline / invert theme)', () => {

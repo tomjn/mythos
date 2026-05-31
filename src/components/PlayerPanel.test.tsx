@@ -65,4 +65,21 @@ describe('PlayerPanel', () => {
     expect(panels[0]).toHaveAttribute('data-running', 'true')
     expect(panels[1]).toHaveAttribute('data-running', 'false')
   })
+
+  it('applies the default theme palette as CSS variables on the panel root', () => {
+    localStorage.setItem('mythos-match-v1', JSON.stringify({
+      players: [
+        { name: 'Player 1', chakra: 5, mission: 0, clockMs: 900000, timedOut: false },
+        { name: 'Player 2', chakra: 5, mission: 0, clockMs: 900000, timedOut: false },
+      ],
+      active: 0, activeSince: 1000, edge: null, paused: false,
+      roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
+      settings: { startMs: 900000 },
+    }))
+    const { container } = render(<MatchProvider><PlayerPanel index={0} flipped={false} /></MatchProvider>)
+    const panel = container.querySelector('[data-running="true"]') as HTMLElement
+    // No ThemeProvider here, so PlayerPanel resolves the default (naruto) palette.
+    expect(panel.style.getPropertyValue('--player-bg')).toBe('#5b1418')
+    expect(panel.style.getPropertyValue('--btn-plus-fill')).toBe('#f59e42')
+  })
 })

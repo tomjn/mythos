@@ -25,7 +25,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
     <div
       data-flipped={flipped}
       data-running={isActive}
-      className="relative flex h-full flex-col overflow-hidden rounded-2xl transition-[background-color,box-shadow] duration-300 motion-reduce:transition-none"
+      className="relative flex h-full flex-col overflow-hidden rounded-2xl transition-[background-color,box-shadow,color] duration-300 motion-reduce:transition-none"
       style={{
         ...vars,
         background: vars['--player-bg'],

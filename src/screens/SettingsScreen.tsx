@@ -23,6 +23,7 @@ export function SettingsScreen() {
       <div className="flex items-center gap-3">
         <Link to="/" aria-label="Back to match"><ArrowLeft /></Link>
         <h1 className="text-xl font-bold">Settings</h1>
+        <Button variant="destructive" className="ml-auto" onClick={() => { dispatch({ type: 'NEW_MATCH' }); navigate('/') }}>New match</Button>
       </div>
 
       <div className="space-y-2">
@@ -54,34 +55,31 @@ export function SettingsScreen() {
       </div>
 
       <div className="space-y-2">
-        <Label>Appearance</Label>
-        <div role="radiogroup" aria-label="Theme" className="flex flex-col gap-2">
+        <Label>Theme</Label>
+        <div className="flex flex-col gap-2">
           {THEMES.map((t) => {
             const selected = t.id === themeId
             return (
-              <button
+              <label
                 key={t.id}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                aria-label={t.label}
-                onClick={() => setTheme(t.id)}
-                className={`flex items-center justify-between rounded-lg border px-3 py-2 text-left transition-colors ${
+                className={`flex cursor-pointer items-center justify-between rounded-lg border px-3 py-2 transition-colors focus-within:ring-2 focus-within:ring-slate-100 ${
                   selected ? 'border-slate-100 bg-slate-800' : 'border-slate-700 hover:bg-slate-800/60'
                 }`}
               >
-                <span className="font-medium">{t.label}</span>
-                <span className="flex gap-1" aria-hidden="true">
-                  <span className="h-5 w-5 rounded-full border border-black/20" style={{ background: t.players[0].bg }} />
-                  <span className="h-5 w-5 rounded-full border border-black/20" style={{ background: t.players[1].bg }} />
+                <span className="flex items-center gap-3">
+                  <input type="radio" name="theme" value={t.id} checked={selected}
+                    onChange={() => setTheme(t.id)} className="sr-only" />
+                  <span className="font-medium">{t.label}</span>
                 </span>
-              </button>
+                <span className="flex gap-1" aria-hidden="true">
+                  <span className="h-5 w-5 rounded-full border border-slate-500" style={{ background: t.players[0].bg }} />
+                  <span className="h-5 w-5 rounded-full border border-slate-500" style={{ background: t.players[1].bg }} />
+                </span>
+              </label>
             )
           })}
         </div>
       </div>
-
-      <Button variant="destructive" onClick={() => { dispatch({ type: 'NEW_MATCH' }); navigate('/') }}>New match</Button>
 
       <ShareCard />
 

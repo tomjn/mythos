@@ -1,4 +1,6 @@
 import { useMatch, useNow } from '@/match/MatchContext'
+import { useTheme } from '@/match/ThemeContext'
+import { panelVars, type PanelState } from '@/match/themes'
 import { liveClockMs, liveRoundMs } from '@/match/timing'
 import type { PlayerIndex } from '@/match/types'
 import { ClockDisplay } from './ClockDisplay'
@@ -7,6 +9,7 @@ import { EdgePill } from './EdgePill'
 
 export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: boolean }) {
   const { match, dispatch } = useMatch()
+  const { theme } = useTheme()
   const roundMode = match.roundTimer.enabled
   const running = roundMode ? !match.paused : match.active === index && !match.paused
   const now = useNow(running)
@@ -15,17 +18,18 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
   const isActive = !roundMode && !match.paused && match.active === index
   const isWaiting = !roundMode && !match.paused && match.active != null && match.active !== index
 
+  const state: PanelState = isActive ? 'active' : isWaiting ? 'waiting' : 'neutral'
+  const vars = panelVars(theme, index, state)
+
   return (
     <div
       data-flipped={flipped}
       data-running={isActive}
-      className={`theme-${index === 0 ? 'p1' : 'p2'} relative flex h-full flex-col overflow-hidden rounded-2xl transition-[background-color,box-shadow] duration-300 motion-reduce:transition-none`}
+      className="relative flex h-full flex-col overflow-hidden rounded-2xl transition-[background-color,box-shadow] duration-300 motion-reduce:transition-none"
       style={{
-        // Only the base fill dims while waiting — the clock, counters and every
-        // button keep their own full-strength colours so the opponent can still
-        // read (and adjust) the other half at any time.
-        background: isWaiting ? 'color-mix(in srgb, var(--player-bg) 30%, #171717)' : 'var(--player-bg)',
-        color: 'var(--player-accent)',
+        ...vars,
+        background: vars['--player-bg'],
+        color: vars['--player-accent'],
         transform: flipped ? 'rotate(180deg)' : undefined,
         boxShadow: isActive ? 'inset 0 0 0 4px var(--player-accent)' : 'inset 0 0 0 0 transparent',
       }}

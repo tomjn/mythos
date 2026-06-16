@@ -16,6 +16,15 @@ export interface RoundTimer {
   remainingMs: number
 }
 
+/** Last dice roll: one d20 per side, winner is the higher (null on a tie).
+ *  `at` is the roll timestamp — the display fades out 10s later and a roll
+ *  older than that (e.g. restored from storage on reload) never shows. */
+export interface DiceRoll {
+  rolls: [number, number]
+  winner: PlayerIndex | null
+  at: number
+}
+
 export interface Match {
   players: [Player, Player]
   active: PlayerIndex | null
@@ -25,6 +34,7 @@ export interface Match {
   roundTimer: RoundTimer
   roundSince: number | null
   settings: { startMs: number }
+  dice: DiceRoll | null
 }
 
 export type MatchAction =
@@ -40,4 +50,5 @@ export type MatchAction =
   | { type: 'SET_START_TIME'; ms: number }
   | { type: 'TOGGLE_ROUND_TIMER'; now: number }
   | { type: 'SET_ROUND_DURATION'; ms: number }
+  | { type: 'ROLL_DICE'; rolls: [number, number]; now: number }
   | { type: 'NEW_MATCH' }

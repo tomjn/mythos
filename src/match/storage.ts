@@ -3,7 +3,9 @@ import { STORAGE_KEY } from './constants'
 
 export function saveMatch(m: Match): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(m))
+    // The dice roll is ephemeral table-talk, not match state — never restore it
+    // on reload, so a refresh always clears it.
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...m, dice: null }))
   } catch {
     // storage unavailable / quota — non-fatal
   }

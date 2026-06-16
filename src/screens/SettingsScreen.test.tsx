@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { MatchProvider, useMatch } from '@/match/MatchContext'
@@ -58,8 +58,10 @@ describe('SettingsScreen', () => {
     expect(localStorage.getItem('mythos-theme-v1')).toBe('mono')
   })
 
-  it('returns to the match screen when New match is pressed', async () => {
-    render(
+  // jsdom never fires animationend, so (matching the MatchScreen test) we assert the
+  // exit fade is applied and navigation is deferred until it finishes.
+  it('plays the exit fade and defers navigation when New match is pressed', async () => {
+    const { container } = render(
       <MemoryRouter initialEntries={['/settings']}>
         <MatchProvider>
           <Routes>
@@ -69,8 +71,24 @@ describe('SettingsScreen', () => {
         </MatchProvider>
       </MemoryRouter>,
     )
-    expect(screen.queryByText('match screen')).toBeNull()
     await userEvent.click(screen.getByRole('button', { name: /new match/i }))
-    expect(screen.getByText('match screen')).toBeInTheDocument()
+    expect(container.querySelector('.page-out')).not.toBeNull()
+    expect(screen.queryByText('match screen')).toBeNull()
+  })
+
+  it('plays the exit fade and defers navigation when the back arrow is tapped', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/settings']}>
+        <MatchProvider>
+          <Routes>
+            <Route path="/" element={<div>match screen</div>} />
+            <Route path="/settings" element={<SettingsScreen />} />
+          </Routes>
+        </MatchProvider>
+      </MemoryRouter>,
+    )
+    fireEvent.click(screen.getByLabelText('Back to match'))
+    expect(container.querySelector('.page-out')).not.toBeNull()
+    expect(screen.queryByText('match screen')).toBeNull()
   })
 })

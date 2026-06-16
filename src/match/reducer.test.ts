@@ -113,3 +113,23 @@ describe('reducer counters & toggles', () => {
     expect(m.roundTimer.remainingMs).toBe(12_345)
   })
 })
+
+describe('reducer dice roll', () => {
+  it('ROLL_DICE stores both rolls, the roll time, and flags the higher as winner', () => {
+    const m = matchReducer(fresh(), { type: 'ROLL_DICE', rolls: [7, 14], now: 1000 })
+    expect(m.dice).toEqual({ rolls: [7, 14], winner: 1, at: 1000 })
+  })
+  it('the higher roll wins regardless of side', () => {
+    const m = matchReducer(fresh(), { type: 'ROLL_DICE', rolls: [20, 3], now: 1000 })
+    expect(m.dice).toEqual({ rolls: [20, 3], winner: 0, at: 1000 })
+  })
+  it('equal rolls are a tie with no winner', () => {
+    const m = matchReducer(fresh(), { type: 'ROLL_DICE', rolls: [11, 11], now: 1000 })
+    expect(m.dice).toEqual({ rolls: [11, 11], winner: null, at: 1000 })
+  })
+  it('NEW_MATCH clears any prior dice roll', () => {
+    let m = matchReducer(fresh(), { type: 'ROLL_DICE', rolls: [5, 9], now: 1000 })
+    m = matchReducer(m, { type: 'NEW_MATCH' })
+    expect(m.dice).toBeNull()
+  })
+})

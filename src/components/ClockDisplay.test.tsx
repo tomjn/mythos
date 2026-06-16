@@ -23,4 +23,12 @@ describe('ClockDisplay', () => {
     render(<ClockDisplay ms={20 * 1000} timedOut={false} />)
     expect(screen.getByTestId('clock')).toHaveAttribute('data-level', 'danger')
   })
+  it('fades on a cycle when paused', () => {
+    render(<ClockDisplay ms={5 * 60 * 1000} timedOut={false} paused />)
+    expect(screen.getByTestId('clock')).toHaveClass('paused-fade')
+  })
+  it('does not fade when not paused', () => {
+    render(<ClockDisplay ms={5 * 60 * 1000} timedOut={false} />)
+    expect(screen.getByTestId('clock')).not.toHaveClass('paused-fade')
+  })
 })

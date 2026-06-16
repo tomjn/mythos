@@ -113,6 +113,15 @@ export function getTheme(id: string | null): Theme {
 
 export type PanelVars = Record<string, string>
 
+// Perceived luminance of a #rrggbb colour; used to pick a contrasting flash.
+function isLight(hex: string): boolean {
+  const h = hex.replace('#', '')
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.55
+}
+
 export function panelVars(theme: Theme, player: PlayerIndex, state: PanelState): PanelVars {
   const half = theme.players[player]
 
@@ -136,10 +145,14 @@ export function panelVars(theme: Theme, player: PlayerIndex, state: PanelState):
 
   const filled = theme.buttons === 'filled'
   const mutedInk = `color-mix(in srgb, ${ink} 55%, transparent)`
+  // Counter-change pulse: a colour that contrasts the panel it sits on. `bg` is a
+  // hex except for the filled-waiting dim (a color-mix) — fall back to the base bg.
+  const bgHex = bg.startsWith('#') ? bg : half.bg
 
   return {
     '--player-bg': bg,
     '--player-accent': ink,
+    '--value-flash': isLight(bgHex) ? '#000000' : '#ffffff',
     '--btn-plus-fill': filled ? half.accent : 'transparent',
     '--btn-plus-ink': filled ? half.accentInk : ink,
     '--btn-plus-border': filled ? 'transparent' : ink,

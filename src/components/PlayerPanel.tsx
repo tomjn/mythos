@@ -11,12 +11,15 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
   const { match, dispatch } = useMatch()
   const { theme } = useTheme()
   const roundMode = match.roundTimer.enabled
-  const running = roundMode ? !match.paused : match.active === index && !match.paused
+  // Whose turn it is (independent of pause) drives the panel's look, so pausing
+  // doesn't erase which player was on the clock. Ticking still requires unpaused.
+  const isTurn = !roundMode && match.active === index
+  const running = !match.paused && (roundMode || isTurn)
   const now = useNow(running)
   const player = match.players[index]
   const displayMs = roundMode ? liveRoundMs(match, now) : liveClockMs(match, index, now)
-  const isActive = !roundMode && !match.paused && match.active === index
-  const isWaiting = !roundMode && !match.paused && match.active != null && match.active !== index
+  const isActive = isTurn
+  const isWaiting = !roundMode && match.active != null && !isTurn
 
   const state: PanelState = isActive ? 'active' : isWaiting ? 'waiting' : 'neutral'
   const vars = panelVars(theme, index, state)
@@ -47,7 +50,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
         disabled={roundMode}
         className="flex flex-1 items-center justify-center transition-transform duration-100 active:scale-95 disabled:cursor-default disabled:active:scale-100 motion-reduce:transition-none motion-reduce:active:scale-100"
       >
-        <ClockDisplay ms={displayMs} timedOut={roundMode ? false : player.timedOut} />
+        <ClockDisplay ms={displayMs} timedOut={roundMode ? false : player.timedOut} paused={match.paused && (roundMode || isTurn)} />
       </button>
 
       <div className="grid grid-cols-2">

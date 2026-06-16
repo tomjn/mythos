@@ -14,6 +14,11 @@ describe('storage', () => {
     saveMatch(m)
     expect(loadMatch()).toEqual(m)
   })
+  it('does not persist the ephemeral dice roll across a reload', () => {
+    const m = { ...createInitialMatch(MIN_START_MS), dice: { rolls: [7, 14] as [number, number], winner: 1 as const, at: 123 } }
+    saveMatch(m)
+    expect(loadMatch()?.dice).toBeNull()
+  })
   it('returns null on corrupt data', () => {
     localStorage.setItem(STORAGE_KEY, '{not json')
     expect(loadMatch()).toBeNull()

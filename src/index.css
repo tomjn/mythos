@@ -35,6 +35,15 @@ body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; 
 }
 .reset-spin { animation: reset-spin 350ms cubic-bezier(0.22, 1, 0.36, 1); }
 
+/* Dice roll feedback: the d20 result spins in and settles, so a fresh roll reads as
+   a roll rather than a static number. Replayed on each roll via a React key. The
+   reduced-motion block below collapses it to an instant appearance. */
+@keyframes dice-roll {
+  from { transform: rotate(-180deg) scale(0.4); opacity: 0; }
+  to   { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+.dice-roll { animation: dice-roll 400ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
 /* Match entrance/exit: the two player halves slide in from their own outer edge to
    meet in the centre, and reverse back out when Settings opens. Direction is set
    per-side via --side-from-* inline so one keyframe pair covers both orientations. */

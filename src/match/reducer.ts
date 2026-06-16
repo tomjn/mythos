@@ -100,6 +100,11 @@ export function matchReducer(m: Match, action: MatchAction): Match {
     }
     case 'SET_ROUND_DURATION':
       return { ...m, roundTimer: { ...m.roundTimer, durationMs: action.ms, remainingMs: action.ms }, roundSince: null }
+    case 'ROLL_DICE': {
+      const [a, b] = action.rolls
+      const winner: PlayerIndex | null = a === b ? null : a > b ? 0 : 1
+      return { ...m, dice: { rolls: action.rolls, winner, at: action.now } }
+    }
     case 'NEW_MATCH': {
       const seed = createInitialMatch(m.settings.startMs)
       return {

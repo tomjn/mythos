@@ -19,5 +19,6 @@ export function createInitialMatch(startMs: number = MIN_START_MS): Match {
     roundTimer: { enabled: false, durationMs: DEFAULT_ROUND_MS, remainingMs: DEFAULT_ROUND_MS },
     roundSince: null,
     settings: { startMs: start },
+    dice: null,
   }
 }

@@ -96,3 +96,16 @@ describe('panelVars (outline / invert theme)', () => {
     expect(v['--clock-danger']).toBe('#ef4444')
   })
 })
+
+describe('panelVars value-flash (counter pulse colour)', () => {
+  it('flashes white on dark panels and black on light panels', () => {
+    expect(panelVars(getTheme('naruto'), 0, 'active')['--value-flash']).toBe('#ffffff')
+    expect(panelVars(getTheme('scroll'), 0, 'active')['--value-flash']).toBe('#000000')
+  })
+
+  it('tracks the resolved background when the theme inverts (mono)', () => {
+    const mono = getTheme('mono')
+    expect(panelVars(mono, 0, 'active')['--value-flash']).toBe('#000000') // white panel
+    expect(panelVars(mono, 0, 'neutral')['--value-flash']).toBe('#ffffff') // inverted to black panel
+  })
+})

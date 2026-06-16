@@ -18,12 +18,23 @@ export function SettingsScreen() {
   const [roundMinutes, setRoundMinutes] = useState(String(Math.round(match.roundTimer.durationMs / 60000)))
   const { themeId, setTheme } = useTheme()
 
+  // Fade Settings out before returning to the match, so the backdrop colour change
+  // eases in rather than cutting hard (most noticeable on the light themes).
+  const [leaving, setLeaving] = useState(false)
+  const leave = (before?: () => void) => { before?.(); setLeaving(true) }
+  const onAnimEnd = (e: React.AnimationEvent) => {
+    if (leaving && e.animationName === 'page-out') navigate('/')
+  }
+
   return (
-    <div className="page-in flex min-h-full w-full flex-col gap-6 bg-slate-900 p-6 text-slate-100">
+    <div
+      onAnimationEnd={onAnimEnd}
+      className={`${leaving ? 'page-out' : 'page-in'} flex min-h-full w-full flex-col gap-6 bg-slate-900 p-6 text-slate-100`}
+    >
       <div className="flex items-center gap-3">
-        <Link to="/" aria-label="Back to match"><ArrowLeft /></Link>
+        <Link to="/" aria-label="Back to match" onClick={(e) => { e.preventDefault(); leave() }}><ArrowLeft /></Link>
         <h1 className="text-xl font-bold">Settings</h1>
-        <Button variant="destructive" className="ml-auto" onClick={() => { dispatch({ type: 'NEW_MATCH' }); navigate('/') }}>New match</Button>
+        <Button variant="destructive" className="ml-auto" onClick={() => leave(() => dispatch({ type: 'NEW_MATCH' }))}>New match</Button>
       </div>
 
       <div className="space-y-2">

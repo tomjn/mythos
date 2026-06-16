@@ -37,6 +37,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [themeId])
 
   const theme = getTheme(themeId)
+
+  // Paint the page backdrop with the theme colour so it sits behind both screens;
+  // the Settings exit fade then reveals this colour instead of a hard black flash.
+  useEffect(() => {
+    document.body.style.backgroundColor = theme.backdrop
+  }, [theme.backdrop])
+
   return (
     <ThemeContext.Provider value={{ theme, themeId: theme.id, setTheme: setThemeId }}>
       {children}

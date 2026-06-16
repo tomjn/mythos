@@ -163,6 +163,34 @@ describe('CenterBand', () => {
     expect(screen.getByTestId('dice-1')).toHaveClass('absolute')
   })
 
+  it('pulses the control while the match is paused', () => {
+    localStorage.setItem('mythos-match-v1', JSON.stringify({
+      players: [
+        { name: 'Player 1', chakra: 5, mission: 0, clockMs: 900000, timedOut: false },
+        { name: 'Player 2', chakra: 5, mission: 0, clockMs: 900000, timedOut: false },
+      ],
+      active: 0, activeSince: null, edge: null, paused: true,
+      roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
+      settings: { startMs: 900000 }, dice: null,
+    }))
+    renderBand()
+    expect(screen.getByRole('button', { name: /resume/i })).toHaveClass('paused-pulse')
+  })
+
+  it('does not pulse the control while running', () => {
+    localStorage.setItem('mythos-match-v1', JSON.stringify({
+      players: [
+        { name: 'Player 1', chakra: 5, mission: 0, clockMs: 900000, timedOut: false },
+        { name: 'Player 2', chakra: 5, mission: 0, clockMs: 900000, timedOut: false },
+      ],
+      active: 0, activeSince: 1000, edge: null, paused: false,
+      roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
+      settings: { startMs: 900000 }, dice: null,
+    }))
+    renderBand()
+    expect(screen.getByRole('button', { name: /pause/i })).not.toHaveClass('paused-pulse')
+  })
+
   it('shows the dice button before the match starts', () => {
     renderBand()
     expect(screen.getByRole('button', { name: /roll dice/i })).toBeInTheDocument()

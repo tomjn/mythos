@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { Dices, Pause, Play, Settings } from 'lucide-react'
 import { useMatch } from '@/match/MatchContext'
@@ -70,7 +70,8 @@ export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }:
     </span>
   ) : (
     <button type="button" aria-label={match.paused ? 'Resume' : 'Pause'} onClick={toggle}
-      className="hover-lift rounded-full p-2 active:scale-95" style={{ backgroundColor: buttonBg }}>
+      className={`hover-lift rounded-full p-2 active:scale-95 ${match.paused ? 'paused-pulse' : ''}`}
+      style={{ backgroundColor: buttonBg, '--pulse': theme.chrome.ink } as CSSProperties}>
       {match.paused ? <Play size={20} /> : <Pause size={20} />}
     </button>
   )

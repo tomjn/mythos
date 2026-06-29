@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { THEMES, DEFAULT_THEME_ID, getTheme, panelVars } from './themes'
 
 describe('theme registry', () => {
-  it('ships five themes with unique ids', () => {
-    expect(THEMES).toHaveLength(5)
+  it('ships six themes with unique ids', () => {
+    expect(THEMES).toHaveLength(6)
     const ids = THEMES.map((t) => t.id)
-    expect(new Set(ids).size).toBe(5)
+    expect(new Set(ids).size).toBe(6)
     expect(ids).toContain(DEFAULT_THEME_ID)
   })
 
@@ -24,7 +24,7 @@ describe('theme registry', () => {
 
   it('flags the display font on the Naruto-flavoured themes only', () => {
     const withFont = THEMES.filter((t) => t.displayFont).map((t) => t.id)
-    expect(new Set(withFont)).toEqual(new Set(['naruto', 'kurama', 'scroll', 'konoha']))
+    expect(new Set(withFont)).toEqual(new Set(['naruto', 'kurama', 'scroll', 'konoha', 'tenchi']))
     expect(getTheme('mono').displayFont).toBeFalsy()
   })
 

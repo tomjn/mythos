@@ -7,9 +7,10 @@ interface StatTileProps {
   onInc: () => void
   onDec: () => void
   onReset?: () => void
+  displayFont?: boolean
 }
 
-export function StatTile({ label, value, onInc, onDec, onReset }: StatTileProps) {
+export function StatTile({ label, value, onInc, onDec, onReset, displayFont }: StatTileProps) {
   const [spinKey, setSpinKey] = useState(0)
   const handleReset = () => {
     setSpinKey((k) => k + 1)
@@ -19,7 +20,7 @@ export function StatTile({ label, value, onInc, onDec, onReset }: StatTileProps)
   return (
     <div className="flex flex-col items-center gap-2 p-3">
       <div className="flex items-center gap-2">
-        <span className="text-xs font-semibold tracking-widest opacity-80">{label}</span>
+        <span className={`text-xs font-semibold tracking-widest opacity-80 ${displayFont ? 'font-ninja' : ''}`}>{label}</span>
         {onReset && (
           <button type="button" aria-label={`Reset ${label}`} onClick={handleReset}
             className="hover-lift rounded-full p-1 opacity-70 transition-transform duration-200 active:scale-90 active:opacity-100">

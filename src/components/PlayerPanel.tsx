@@ -23,6 +23,9 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
 
   const state: PanelState = isActive ? 'active' : isWaiting ? 'waiting' : 'neutral'
   const vars = panelVars(theme, index, state)
+  // On display-font themes the brush face squishes "Player 1"; split off the trailing
+  // number so it can be badged (in the UI font) and stay distinct from the name.
+  const nameMatch = theme.displayFont ? player.name.match(/^(.*?)(\d+)$/) : null
 
   return (
     <div
@@ -38,7 +41,21 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
       }}
     >
       <div className="flex items-center justify-between px-4 pt-3">
-        <span className="text-lg font-bold">{player.name}</span>
+        <span className={`text-lg font-bold ${theme.displayFont ? 'font-ninja' : ''}`}>
+          {nameMatch ? (
+            <>
+              {nameMatch[1]}
+              <span
+                className="ml-2 rounded px-1.5 font-sans tabular-nums"
+                style={{ background: 'var(--player-accent)', color: 'var(--player-bg)' }}
+              >
+                {nameMatch[2]}
+              </span>
+            </>
+          ) : (
+            player.name
+          )}
+        </span>
         <EdgePill active={match.edge === index} onToggle={() => dispatch({ type: 'SET_EDGE', player: index })} />
       </div>
 
@@ -60,6 +77,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
           onInc={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: 1 })}
           onDec={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: -1 })}
           onReset={() => dispatch({ type: 'RESET_CHAKRA', player: index })}
+          displayFont={theme.displayFont}
         />
         <StatTile
           label="MISSION"
@@ -67,6 +85,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
           onInc={() => dispatch({ type: 'ADJUST_MISSION', player: index, delta: 1 })}
           onDec={() => dispatch({ type: 'ADJUST_MISSION', player: index, delta: -1 })}
           onReset={() => dispatch({ type: 'RESET_MISSION', player: index })}
+          displayFont={theme.displayFont}
         />
       </div>
     </div>

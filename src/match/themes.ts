@@ -15,6 +15,8 @@ export interface HalfTheme {
 export interface Theme {
   id: string
   label: string
+  /** When set, headings and theme names render in the "Ninja Naruto" display font. */
+  displayFont?: boolean
   buttons: ButtonStyle
   wait: WaitStyle
   warn: string
@@ -36,6 +38,7 @@ export const THEMES: Theme[] = [
   {
     id: 'naruto',
     label: 'Naruto',
+    displayFont: true,
     buttons: 'filled',
     wait: 'dim',
     warn: AMBER,
@@ -64,6 +67,7 @@ export const THEMES: Theme[] = [
   {
     id: 'kurama',
     label: 'Kurama',
+    displayFont: true,
     buttons: 'filled',
     wait: 'dim',
     warn: AMBER,
@@ -78,6 +82,7 @@ export const THEMES: Theme[] = [
   {
     id: 'scroll',
     label: 'Forbidden Scroll',
+    displayFont: true,
     buttons: 'filled',
     wait: 'dim',
     warn: DEEP_AMBER,
@@ -92,6 +97,7 @@ export const THEMES: Theme[] = [
   {
     id: 'konoha',
     label: 'Konoha',
+    displayFont: true,
     buttons: 'filled',
     wait: 'dim',
     warn: AMBER,
@@ -101,6 +107,23 @@ export const THEMES: Theme[] = [
     players: [
       { bg: '#143a26', ink: '#8fe3ab', surface: '#1d5236', accent: '#4fc27e', accentInk: '#06200f' },
       { bg: '#3d2c18', ink: '#e3c08f', surface: '#56401f', accent: '#c2944f', accentInk: '#241806' },
+    ],
+  },
+  {
+    id: 'tenchi',
+    label: 'Heaven & Earth',
+    displayFont: true,
+    buttons: 'filled',
+    wait: 'dim',
+    warn: DEEP_AMBER, // legible on the cream (Heaven) half
+    danger: RED,
+    backdrop: '#123a3d', // the teal glow around the scrolls
+    chrome: { bg: '#123a3d', ink: '#e7e0c6' },
+    players: [
+      // Scroll of Heaven (天): cream parchment, deep-navy ink and accents.
+      { bg: '#e7e0c6', ink: '#232a52', surface: '#d6cda9', accent: '#2c3568', accentInk: '#eee7cf' },
+      // Scroll of Earth (地): deep indigo body, cream ink and accents.
+      { bg: '#2c3568', ink: '#e7e0c6', surface: '#3a4480', accent: '#e7e0c6', accentInk: '#232a52' },
     ],
   },
 ]

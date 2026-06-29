@@ -16,6 +16,7 @@ const DICE_OFFSET_PX = 40
 export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }: { vertical?: boolean; onOpenSettings?: () => void; animClass?: string }) {
   const { match, dispatch } = useMatch()
   const { theme } = useTheme()
+  const ninja = theme.displayFont ? 'font-ninja' : ''
   const chrome = { backgroundColor: theme.chrome.bg, color: theme.chrome.ink }
   const buttonBg = `color-mix(in srgb, ${theme.chrome.ink} 18%, ${theme.chrome.bg})`
 
@@ -63,7 +64,7 @@ export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }:
 
   const control = idle ? (
     <span
-      className="text-xs font-medium uppercase tracking-wide opacity-60"
+      className={`text-xs font-medium uppercase tracking-wide opacity-60 ${ninja}`}
       style={vertical ? { writingMode: 'vertical-rl' } : undefined}
     >
       Tap a side to start
@@ -128,8 +129,8 @@ export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }:
   // button holds the two rolls, each absolutely positioned over it and nudged toward
   // its own player. Absolute positioning keeps the rolls out of flow, so a two-digit
   // result never resizes the bar.
-  const diceTrigger = (buttonClass: string) => (
-    <div data-testid="dice-result" data-visible={String(showDice)} className="relative">
+  const diceTrigger = (buttonClass: string, wrapperClass = '') => (
+    <div data-testid="dice-result" data-visible={String(showDice)} className={`relative ${wrapperClass}`}>
       <button type="button" aria-label="Roll dice" onClick={roll} className={buttonClass}>
         <Dices size={20} />
       </button>
@@ -154,7 +155,7 @@ export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }:
   return (
     <div className={`relative z-10 flex min-h-11 items-center justify-between gap-4 px-4 ${animClass}`} style={chrome}>
       {/* Spacer keeps the control centred opposite Settings once the dice button is gone. */}
-      {matchStarted ? <span className="w-10" /> : diceTrigger('hover-lift flex items-center self-stretch rounded-lg px-3 active:scale-95')}
+      {matchStarted ? <span className="w-10" /> : diceTrigger('hover-lift flex items-center self-stretch rounded-lg px-3 active:scale-95', 'flex self-stretch')}
       {control}
       <Link to="/settings" aria-label="Settings" className="hover-lift flex items-center self-stretch rounded-lg px-3"
         onClick={(e) => { if (onOpenSettings) { e.preventDefault(); onOpenSettings() } }}><Settings size={20} /></Link>

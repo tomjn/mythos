@@ -16,7 +16,11 @@ export function SettingsScreen() {
   const navigate = useNavigate()
   const [minutes, setMinutes] = useState(String(Math.round(match.settings.startMs / 60000)))
   const [roundMinutes, setRoundMinutes] = useState(String(Math.round(match.roundTimer.durationMs / 60000)))
-  const { themeId, setTheme } = useTheme()
+  const { theme, themeId, setTheme } = useTheme()
+  const ninja = theme.displayFont ? 'font-ninja' : ''
+  // The brush face crowds parentheses against their text, so pad them out — but only
+  // on the display-font themes where that font is actually in use.
+  const pad = (s: string) => (theme.displayFont ? s.replace(/\(/g, '( ').replace(/\)/g, ' )') : s)
 
   // Fade Settings out before returning to the match, so the backdrop colour change
   // eases in rather than cutting hard (most noticeable on the light themes).
@@ -32,13 +36,20 @@ export function SettingsScreen() {
       className={`${leaving ? 'page-out' : 'page-in'} flex min-h-full w-full flex-col gap-6 bg-slate-900 p-6 text-slate-100`}
     >
       <div className="flex items-center gap-3">
-        <Link to="/" aria-label="Back to match" onClick={(e) => { e.preventDefault(); leave() }}><ArrowLeft /></Link>
-        <h1 className="text-xl font-bold">Settings</h1>
+        <Link
+          to="/"
+          aria-label="Back to match"
+          onClick={(e) => { e.preventDefault(); leave() }}
+          className="hover-lift -mx-2 flex items-center gap-3 rounded-lg px-2 py-1"
+        >
+          <ArrowLeft />
+          <h1 className={`text-xl font-bold ${ninja}`}>Settings</h1>
+        </Link>
         <Button variant="destructive" className="ml-auto" onClick={() => leave(() => dispatch({ type: 'NEW_MATCH' }))}>New match</Button>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="start">Minutes per player (min 15)</Label>
+        <Label htmlFor="start" className={ninja}>{pad('Minutes per player (min 15)')}</Label>
         <div className="flex gap-4">
           <Input id="start" type="number" inputMode="numeric" min={15} value={minutes}
             onChange={(e) => setMinutes(e.target.value)} />
@@ -49,13 +60,13 @@ export function SettingsScreen() {
       </div>
 
       <div className="flex items-center justify-between">
-        <Label htmlFor="round">Shared round timer</Label>
+        <Label htmlFor="round" className={ninja}>Shared round timer</Label>
         <Switch id="round" aria-label="Round timer" checked={match.roundTimer.enabled}
           onCheckedChange={() => dispatch({ type: 'TOGGLE_ROUND_TIMER', now: Date.now() })} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="roundlen">Round length (minutes)</Label>
+        <Label htmlFor="roundlen" className={ninja}>{pad('Round length (minutes)')}</Label>
         <div className="flex gap-4">
           <Input id="roundlen" type="number" inputMode="numeric" min={1} value={roundMinutes}
             onChange={(e) => setRoundMinutes(e.target.value)} />
@@ -66,7 +77,7 @@ export function SettingsScreen() {
       </div>
 
       <div className="space-y-2">
-        <Label>Theme</Label>
+        <Label className={ninja}>Theme</Label>
         <div className="flex flex-col gap-2">
           {THEMES.map((t) => {
             const selected = t.id === themeId

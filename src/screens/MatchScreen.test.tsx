@@ -13,8 +13,10 @@ describe('MatchScreen', () => {
         <MatchProvider><MatchScreen /></MatchProvider>
       </MemoryRouter>,
     )
-    expect(screen.getByText('Player 1')).toBeInTheDocument()
-    expect(screen.getByText('Player 2')).toBeInTheDocument()
+    // Display-font themes badge the trailing number into its own span, splitting the
+    // name across elements — match on each wrapper span's combined text.
+    expect(screen.getByText((_, el) => el?.tagName === 'SPAN' && el?.textContent === 'Player 1')).toBeInTheDocument()
+    expect(screen.getByText((_, el) => el?.tagName === 'SPAN' && el?.textContent === 'Player 2')).toBeInTheDocument()
     expect(screen.getByTestId('tap-surface-0')).toBeInTheDocument()
     expect(screen.getByTestId('tap-surface-1')).toBeInTheDocument()
   })

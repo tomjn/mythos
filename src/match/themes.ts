@@ -15,6 +15,8 @@ export interface HalfTheme {
 export interface Theme {
   id: string
   label: string
+  /** When set, headings and theme names render in the "Ninja Naruto" display font. */
+  displayFont?: boolean
   buttons: ButtonStyle
   wait: WaitStyle
   warn: string
@@ -36,6 +38,7 @@ export const THEMES: Theme[] = [
   {
     id: 'naruto',
     label: 'Naruto',
+    displayFont: true,
     buttons: 'filled',
     wait: 'dim',
     warn: AMBER,
@@ -64,6 +67,7 @@ export const THEMES: Theme[] = [
   {
     id: 'kurama',
     label: 'Kurama',
+    displayFont: true,
     buttons: 'filled',
     wait: 'dim',
     warn: AMBER,
@@ -78,6 +82,7 @@ export const THEMES: Theme[] = [
   {
     id: 'scroll',
     label: 'Forbidden Scroll',
+    displayFont: true,
     buttons: 'filled',
     wait: 'dim',
     warn: DEEP_AMBER,
@@ -92,6 +97,7 @@ export const THEMES: Theme[] = [
   {
     id: 'konoha',
     label: 'Konoha',
+    displayFont: true,
     buttons: 'filled',
     wait: 'dim',
     warn: AMBER,

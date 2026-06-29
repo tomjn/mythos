@@ -22,6 +22,12 @@ describe('theme registry', () => {
     }
   })
 
+  it('flags the display font on the Naruto-flavoured themes only', () => {
+    const withFont = THEMES.filter((t) => t.displayFont).map((t) => t.id)
+    expect(new Set(withFont)).toEqual(new Set(['naruto', 'kurama', 'scroll', 'konoha']))
+    expect(getTheme('mono').displayFont).toBeFalsy()
+  })
+
   it('getTheme falls back to the default for unknown or null ids', () => {
     expect(getTheme(null).id).toBe(DEFAULT_THEME_ID)
     expect(getTheme('does-not-exist').id).toBe(DEFAULT_THEME_ID)

@@ -16,7 +16,9 @@ describe('PlayerPanel', () => {
     const { container } = render(
       <MatchProvider><PlayerPanel index={0} flipped /></MatchProvider>,
     )
-    expect(screen.getByText('Player 1')).toBeInTheDocument()
+    // The trailing number is badged into its own span on display-font themes, so the
+    // name spans two elements — assert on the wrapper's combined text.
+    expect(screen.getByText((_, el) => el?.tagName === 'SPAN' && el?.textContent === 'Player 1')).toBeInTheDocument()
     expect(container.querySelector('[data-flipped="true"]')).not.toBeNull()
   })
 

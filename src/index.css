@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* "Ninja Naruto" display face — used only for headings and theme names on the
+   Naruto-flavoured themes (see Theme.displayFont). swap so text stays visible
+   while the woff2 loads. */
+@font-face {
+  font-family: 'Ninja Naruto';
+  src: url('./assets/njnaruto-accented.woff2') format('woff2');
+  font-display: swap;
+}
+
 :root { color-scheme: dark; }
 html, body, #root { height: 100%; margin: 0; }
 body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; }

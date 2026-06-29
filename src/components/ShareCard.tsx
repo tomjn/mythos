@@ -1,4 +1,5 @@
 import { QRCodeSVG } from 'qrcode.react'
+import { useTheme } from '@/match/ThemeContext'
 
 // The app's own URL, minus the hash route, so the QR points at the app root
 // wherever it's hosted (GitHub Pages today, elsewhere later).
@@ -9,9 +10,10 @@ function shareUrl(): string {
 
 export function ShareCard() {
   const url = shareUrl()
+  const { theme } = useTheme()
   return (
     <section className="flex flex-col items-center gap-3 rounded-xl bg-slate-800/50 p-5 text-center">
-      <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-300">Share</h2>
+      <h2 className={`text-sm font-semibold uppercase tracking-widest text-slate-300 ${theme.displayFont ? 'font-ninja' : ''}`}>Share</h2>
       <div className="rounded-xl bg-white p-3">
         <QRCodeSVG
           value={url}

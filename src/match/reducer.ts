@@ -1,6 +1,7 @@
 import type { Match, MatchAction, Player, PlayerIndex } from './types'
 import { createInitialMatch } from './state'
-import { BASE_CHAKRA, MIN_START_MS } from './constants'
+import { DELTA_WINDOW_MS, MIN_START_MS } from './constants'
+import { formatMinutes } from './format'
 
 function settle(m: Match, now: number): Match {
   let players = m.players
@@ -30,6 +31,24 @@ function setPlayer(m: Match, index: PlayerIndex, patch: Partial<Player>): Match 
   return { ...m, players }
 }
 
+function logEvent(m: Match, at: number, text: string): Match {
+  return { ...m, log: [...m.log, { at, kind: 'event', text }] }
+}
+
+// Sets a counter and logs it. Taps on the same counter that keep arriving within
+// DELTA_WINDOW_MS of each other merge into one entry; one that nets out to no
+// change (a corrected mis-tap) drops out of the log.
+function setStat(m: Match, index: PlayerIndex, stat: 'chakra' | 'mission', to: number, now: number): Match {
+  const from = m.players[index][stat]
+  if (from === to) return m
+  const last = m.log[m.log.length - 1]
+  const merges = last?.kind === 'stat' && last.player === index && last.stat === stat && now - last.at < DELTA_WINDOW_MS
+  const start = merges ? last.from : from
+  const rest = merges ? m.log.slice(0, -1) : m.log
+  const log = start === to ? rest : [...rest, { at: now, kind: 'stat' as const, player: index, stat, from: start, to }]
+  return { ...setPlayer(m, index, { [stat]: to }), log }
+}
+
 export function matchReducer(m: Match, action: MatchAction): Match {
   switch (action.type) {
     case 'TAP_HALF': {
@@ -38,11 +57,13 @@ export function matchReducer(m: Match, action: MatchAction): Match {
       // own clock; once a clock is running, tapping a side ends that turn and
       // hands the clock to the opponent.
       const next: PlayerIndex = settled.active == null ? action.player : action.player === 0 ? 1 : 0
-      return { ...settled, paused: false, active: next, activeSince: action.now,
+      const text = settled.active == null ? `${m.players[next].name}'s clock started` : `Turn passed to ${m.players[next].name}`
+      return { ...logEvent(settled, action.now, text), paused: false, active: next, activeSince: action.now,
         roundSince: settled.roundTimer.enabled ? action.now : null }
     }
     case 'PAUSE': {
-      const settled = settle(m, action.now)
+      if (m.paused) return m
+      const settled = logEvent(settle(m, action.now), action.now, action.byLog ? 'Match log opened, which paused the game' : 'Paused')
       return { ...settled, paused: true, activeSince: null, roundSince: null }
     }
     case 'RESUME': {
@@ -50,7 +71,7 @@ export function matchReducer(m: Match, action: MatchAction): Match {
       const runRound = m.roundTimer.enabled
       if (!runClock && !runRound) return m
       return {
-        ...m,
+        ...logEvent(m, action.now, 'Resumed'),
         paused: false,
         activeSince: runClock ? action.now : null,
         roundSince: runRound ? action.now : null,
@@ -58,31 +79,37 @@ export function matchReducer(m: Match, action: MatchAction): Match {
     }
     case 'TIMEOUT': {
       const settled = settle(m, action.now)
-      const stopped = setPlayer(settled, action.player, { clockMs: 0, timedOut: true })
+      const stopped = logEvent(
+        setPlayer(settled, action.player, { clockMs: 0, timedOut: true }),
+        action.now,
+        `${m.players[action.player].name} ran out of time`,
+      )
       const wasActive = settled.active === action.player
       return wasActive ? { ...stopped, active: null, activeSince: null } : stopped
     }
     case 'ADJUST_CHAKRA':
-      return setPlayer(m, action.player, { chakra: Math.max(0, m.players[action.player].chakra + action.delta) })
-    case 'RESET_CHAKRA':
-      return setPlayer(m, action.player, { chakra: BASE_CHAKRA })
+      return setStat(m, action.player, 'chakra', Math.max(0, m.players[action.player].chakra + action.delta), action.now)
     case 'ADJUST_MISSION':
-      return setPlayer(m, action.player, { mission: Math.max(0, m.players[action.player].mission + action.delta) })
+      return setStat(m, action.player, 'mission', Math.max(0, m.players[action.player].mission + action.delta), action.now)
     case 'RESET_MISSION':
-      return setPlayer(m, action.player, { mission: 0 })
-    case 'SET_EDGE':
-      return { ...m, edge: m.edge === action.player ? null : action.player }
+      return setStat(m, action.player, 'mission', 0, action.now)
+    case 'SET_EDGE': {
+      const edge = m.edge === action.player ? null : action.player
+      const name = m.players[action.player].name
+      return { ...logEvent(m, action.now, edge == null ? `${name} gave up the edge` : `${name} took the edge`), edge }
+    }
     case 'SET_START_TIME': {
-      const start = Math.max(MIN_START_MS, action.ms)
+      const start: [number, number] = [Math.max(MIN_START_MS, action.ms[0]), Math.max(MIN_START_MS, action.ms[1])]
+      const text = `Clocks set to ${formatMinutes(start[0])} and ${formatMinutes(start[1])} minutes`
       return {
-        ...m,
+        ...logEvent(m, action.now, text),
         settings: { startMs: start },
         active: null,
         activeSince: null,
         paused: true,
         players: [
-          { ...m.players[0], clockMs: start, timedOut: false },
-          { ...m.players[1], clockMs: start, timedOut: false },
+          { ...m.players[0], clockMs: start[0], timedOut: false },
+          { ...m.players[1], clockMs: start[1], timedOut: false },
         ],
       }
     }
@@ -90,7 +117,7 @@ export function matchReducer(m: Match, action: MatchAction): Match {
       const settled = settle(m, action.now)
       const enabled = !settled.roundTimer.enabled
       return {
-        ...settled,
+        ...logEvent(settled, action.now, enabled ? 'Shared round timer turned on' : 'Shared round timer turned off'),
         active: null,
         activeSince: null,
         paused: true,
@@ -99,11 +126,16 @@ export function matchReducer(m: Match, action: MatchAction): Match {
       }
     }
     case 'SET_ROUND_DURATION':
-      return { ...m, roundTimer: { ...m.roundTimer, durationMs: action.ms, remainingMs: action.ms }, roundSince: null }
+      return {
+        ...logEvent(m, action.now, `Round length set to ${formatMinutes(action.ms)} minutes`),
+        roundTimer: { ...m.roundTimer, durationMs: action.ms, remainingMs: action.ms },
+        roundSince: null,
+      }
     case 'ROLL_DICE': {
       const [a, b] = action.rolls
       const winner: PlayerIndex | null = a === b ? null : a > b ? 0 : 1
-      return { ...m, dice: { rolls: action.rolls, winner, at: action.now } }
+      const text = `Dice: ${m.players[0].name} rolled ${a}, ${m.players[1].name} rolled ${b}`
+      return { ...logEvent(m, action.now, text), dice: { rolls: action.rolls, winner, at: action.now } }
     }
     case 'NEW_MATCH': {
       const seed = createInitialMatch(m.settings.startMs)

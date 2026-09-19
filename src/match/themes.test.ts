@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { THEMES, DEFAULT_THEME_ID, getTheme, panelVars } from './themes'
 
 describe('theme registry', () => {
-  it('ships six themes with unique ids', () => {
-    expect(THEMES).toHaveLength(6)
+  it('ships seven themes with unique ids', () => {
+    expect(THEMES).toHaveLength(7)
     const ids = THEMES.map((t) => t.id)
-    expect(new Set(ids).size).toBe(6)
+    expect(new Set(ids).size).toBe(7)
     expect(ids).toContain(DEFAULT_THEME_ID)
   })
 
@@ -24,7 +24,7 @@ describe('theme registry', () => {
 
   it('flags the display font on the Naruto-flavoured themes only', () => {
     const withFont = THEMES.filter((t) => t.displayFont).map((t) => t.id)
-    expect(new Set(withFont)).toEqual(new Set(['naruto', 'kurama', 'scroll', 'konoha', 'tenchi']))
+    expect(new Set(withFont)).toEqual(new Set(['naruto', 'kurama', 'gaara', 'scroll', 'konoha', 'tenchi']))
     expect(getTheme('mono').displayFont).toBeFalsy()
   })
 
@@ -113,5 +113,58 @@ describe('panelVars value-flash (counter pulse colour)', () => {
     const mono = getTheme('mono')
     expect(panelVars(mono, 0, 'active')['--value-flash']).toBe('#000000') // white panel
     expect(panelVars(mono, 0, 'neutral')['--value-flash']).toBe('#ffffff') // inverted to black panel
+  })
+})
+
+describe('panelVars (Gaara: outlined buttons, per-side clock colours)', () => {
+  const gaara = getTheme('gaara')
+
+  it('outlines the filled buttons in black at the theme width', () => {
+    const v = panelVars(gaara, 0, 'active')
+    expect(v['--btn-plus-border']).toBe('#000000')
+    expect(v['--btn-minus-border']).toBe('#000000')
+    expect(v['--btn-border-width']).toBe('4px')
+  })
+
+  it('leaves other filled themes with no outline and the default width', () => {
+    const v = panelVars(getTheme('naruto'), 0, 'active')
+    expect(v['--btn-plus-border']).toBe('transparent')
+    expect(v['--btn-border-width']).toBe('2px')
+  })
+
+  it('gives both sides the same black -1 and white +1 buttons', () => {
+    for (const player of [0, 1] as const) {
+      const v = panelVars(gaara, player, 'active')
+      expect(v['--btn-minus-fill']).toBe('#000000')
+      expect(v['--btn-minus-ink']).toBe('#ffffff')
+      expect(v['--btn-plus-fill']).toBe('#ffffff')
+      expect(v['--btn-plus-ink']).toBe('#432328')
+    }
+  })
+
+  it("rings the active half in its own ring colour where set, else its ink", () => {
+    expect(panelVars(gaara, 0, 'active')['--player-ring']).toBe('#432328')
+    expect(panelVars(gaara, 1, 'active')['--player-ring']).toBe('#000000')
+  })
+
+  it("uses each side's own clock colours where set, else the theme's", () => {
+    const red = panelVars(gaara, 0, 'active')
+    const skin = panelVars(gaara, 1, 'active')
+    expect(red['--clock-danger']).toBe('#fde047')
+    expect(red['--clock-warn']).toBe(gaara.warn)
+    expect(skin['--clock-danger']).toBe('#9a3a45')
+    expect(skin['--clock-warn']).toBe('#b45309')
+  })
+
+  it('swaps a waiting half to its panel colour as ink when that reads better on the dim', () => {
+    // Skin panel, black ink: black is 2.57:1 on the dimmed panel, the skin colour 6.31:1.
+    const skin = panelVars(gaara, 1, 'waiting')
+    expect(skin['--player-accent']).toBe('#fddcc9')
+    expect(skin['--btn-minus-ink']).toBe('#ffffff') // the black -1 button keeps its own white text
+    // Red panel, white ink: already the better of the two, so it stays.
+    expect(panelVars(gaara, 0, 'waiting')['--player-accent']).toBe('#ffffff')
+    // Active and neutral halves keep the authored ink.
+    expect(panelVars(gaara, 1, 'active')['--player-accent']).toBe('#000000')
+    expect(panelVars(gaara, 1, 'neutral')['--player-accent']).toBe('#000000')
   })
 })

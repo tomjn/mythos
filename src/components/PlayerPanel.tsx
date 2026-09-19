@@ -37,7 +37,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
         background: vars['--player-bg'],
         color: vars['--player-accent'],
         transform: flipped ? 'rotate(180deg)' : undefined,
-        boxShadow: isActive ? 'inset 0 0 0 4px var(--player-accent)' : 'inset 0 0 0 0 transparent',
+        boxShadow: isActive ? 'inset 0 0 0 4px var(--player-ring)' : 'inset 0 0 0 0 transparent',
       }}
     >
       <div className="flex items-center justify-between px-4 pt-3">
@@ -56,7 +56,7 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
             player.name
           )}
         </span>
-        <EdgePill active={match.edge === index} onToggle={() => dispatch({ type: 'SET_EDGE', player: index })} />
+        <EdgePill active={match.edge === index} onToggle={() => dispatch({ type: 'SET_EDGE', player: index, now: Date.now() })} />
       </div>
 
       <button
@@ -74,17 +74,17 @@ export function PlayerPanel({ index, flipped }: { index: PlayerIndex; flipped: b
         <StatTile
           label="CHAKRA"
           value={player.chakra}
-          onInc={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: 1 })}
-          onDec={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: -1 })}
-          onReset={() => dispatch({ type: 'RESET_CHAKRA', player: index })}
+          onInc={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: 1, now: Date.now() })}
+          onDec={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: -1, now: Date.now() })}
+          onPlus5={() => dispatch({ type: 'ADJUST_CHAKRA', player: index, delta: 5, now: Date.now() })}
           displayFont={theme.displayFont}
         />
         <StatTile
           label="MISSION"
           value={player.mission}
-          onInc={() => dispatch({ type: 'ADJUST_MISSION', player: index, delta: 1 })}
-          onDec={() => dispatch({ type: 'ADJUST_MISSION', player: index, delta: -1 })}
-          onReset={() => dispatch({ type: 'RESET_MISSION', player: index })}
+          onInc={() => dispatch({ type: 'ADJUST_MISSION', player: index, delta: 1, now: Date.now() })}
+          onDec={() => dispatch({ type: 'ADJUST_MISSION', player: index, delta: -1, now: Date.now() })}
+          onReset={() => dispatch({ type: 'RESET_MISSION', player: index, now: Date.now() })}
           displayFont={theme.displayFont}
         />
       </div>

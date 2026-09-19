@@ -19,10 +19,14 @@ export function loadMatch(): Match | null {
     if (
       parsed &&
       Array.isArray(parsed.players) &&
-      parsed.players.length === 2 &&
-      typeof parsed.settings?.startMs === 'number'
+      parsed.players.length === 2
     ) {
-      return parsed as Match
+      // Matches saved before per-player start times hold a single number, and
+      // ones saved before the log have no log.
+      const startMs = parsed.settings?.startMs
+      const pair = typeof startMs === 'number' ? [startMs, startMs] : startMs
+      if (!Array.isArray(pair) || pair.length !== 2 || !pair.every((n) => typeof n === 'number')) return null
+      return { ...parsed, settings: { startMs: pair }, log: Array.isArray(parsed.log) ? parsed.log : [] } as Match
     }
     return null
   } catch {

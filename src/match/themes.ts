@@ -8,8 +8,15 @@ export interface HalfTheme {
   bg: string // panel background (active look)
   ink: string // clock / numbers / labels (active look)
   surface: string // -1 button fill (filled style)
+  surfaceInk?: string // -1 button text (filled style), when `ink` would not read on `surface`
   accent: string // +1 button fill (filled style)
   accentInk: string // +1 button text (filled style)
+  /** Ring drawn around this half while it is on the clock. Defaults to the ink. */
+  ring?: string
+  /** Clock warn / danger colours for this half, when the theme-wide ones would not
+   *  read on its background (e.g. a red panel). */
+  warn?: string
+  danger?: string
 }
 
 export interface Theme {
@@ -21,6 +28,8 @@ export interface Theme {
   wait: WaitStyle
   warn: string
   danger: string
+  /** Draws a heavy outline around the +1 / -1 buttons (filled style only). */
+  outline?: { color: string; width: string }
   /** Colour behind/between the panels; also the dim target for waiting halves. */
   backdrop: string
   /** The centre control strip (pause / settings). */
@@ -80,6 +89,40 @@ export const THEMES: Theme[] = [
     ],
   },
   {
+    id: 'konoha',
+    label: 'Konohamaru',
+    displayFont: true,
+    buttons: 'filled',
+    wait: 'dim',
+    warn: AMBER,
+    danger: RED,
+    backdrop: DARK_BACKDROP,
+    chrome: DARK_CHROME,
+    players: [
+      { bg: '#143a26', ink: '#8fe3ab', surface: '#1d5236', accent: '#4fc27e', accentInk: '#06200f' },
+      { bg: '#3d2c18', ink: '#e3c08f', surface: '#56401f', accent: '#c2944f', accentInk: '#241806' },
+    ],
+  },
+  {
+    // Colours sampled from Gaara reference stills: hair red and its shadow, and skin. Black backdrop and heavy black button outlines for his eye rings.
+    id: 'gaara',
+    label: 'Gaara',
+    displayFont: true,
+    buttons: 'filled',
+    wait: 'dim',
+    warn: AMBER,
+    danger: RED,
+    outline: { color: '#000000', width: '4px' },
+    backdrop: '#000000',
+    chrome: { bg: '#000000', ink: '#fddcc9' },
+    players: [
+      // Red side. The theme-wide red danger colour vanishes on it, so danger is yellow.
+      { bg: '#9a3a45', ink: '#ffffff', surface: '#000000', accent: '#ffffff', accentInk: '#432328', ring: '#432328', danger: '#fde047' },
+      // Skin side. Amber and bright red wash out on it, so both go darker.
+      { bg: '#fddcc9', ink: '#000000', surface: '#000000', surfaceInk: '#ffffff', accent: '#ffffff', accentInk: '#432328', warn: DEEP_AMBER, danger: '#9a3a45' },
+    ],
+  },
+  {
     id: 'scroll',
     label: 'Forbidden Scroll',
     displayFont: true,
@@ -92,21 +135,6 @@ export const THEMES: Theme[] = [
     players: [
       { bg: '#e9dcc0', ink: '#2a2018', surface: '#d8c6a0', accent: '#b0362f', accentInk: '#fbe7d2' },
       { bg: '#ded0b0', ink: '#2a2018', surface: '#cdbb95', accent: '#2f5d8a', accentInk: '#eef3f8' },
-    ],
-  },
-  {
-    id: 'konoha',
-    label: 'Konoha',
-    displayFont: true,
-    buttons: 'filled',
-    wait: 'dim',
-    warn: AMBER,
-    danger: RED,
-    backdrop: DARK_BACKDROP,
-    chrome: DARK_CHROME,
-    players: [
-      { bg: '#143a26', ink: '#8fe3ab', surface: '#1d5236', accent: '#4fc27e', accentInk: '#06200f' },
-      { bg: '#3d2c18', ink: '#e3c08f', surface: '#56401f', accent: '#c2944f', accentInk: '#241806' },
     ],
   },
   {
@@ -145,6 +173,27 @@ function isLight(hex: string): boolean {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.55
 }
 
+function rgb(hex: string): [number, number, number] {
+  const h = hex.replace('#', '')
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]
+}
+
+// WCAG relative luminance and contrast ratio of two #rrggbb colours.
+function luminance(hex: string): number {
+  const [r, g, b] = rgb(hex).map((c) => {
+    const v = c / 255
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+function contrast(a: string, b: string): number {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+// Share of the panel colour left in a waiting half; the rest is the backdrop.
+const WAIT_MIX = 0.35
+
 export function panelVars(theme: Theme, player: PlayerIndex, state: PanelState): PanelVars {
   const half = theme.players[player]
 
@@ -163,7 +212,15 @@ export function panelVars(theme: Theme, player: PlayerIndex, state: PanelState):
     }
   } else {
     ink = half.ink
-    bg = state === 'waiting' ? `color-mix(in srgb, ${half.bg} 35%, ${theme.backdrop})` : half.bg // neutral falls through to full colour, same as active
+    bg = half.bg // neutral falls through to full colour, same as active
+    if (state === 'waiting') {
+      bg = `color-mix(in srgb, ${half.bg} ${WAIT_MIX * 100}%, ${theme.backdrop})`
+      // Dimming a light panel toward a dark backdrop can leave dark ink unreadable, so
+      // a waiting half takes whichever of its own two colours reads better on the dim.
+      const [p, d] = [rgb(half.bg), rgb(theme.backdrop)]
+      const dimmed = `#${p.map((c, i) => Math.round(c * WAIT_MIX + d[i] * (1 - WAIT_MIX)).toString(16).padStart(2, '0')).join('')}`
+      if (contrast(half.bg, dimmed) > contrast(half.ink, dimmed)) ink = half.bg
+    }
   }
 
   const filled = theme.buttons === 'filled'
@@ -175,14 +232,30 @@ export function panelVars(theme: Theme, player: PlayerIndex, state: PanelState):
   return {
     '--player-bg': bg,
     '--player-accent': ink,
+    '--player-ring': half.ring ?? ink,
     '--value-flash': isLight(bgHex) ? '#000000' : '#ffffff',
     '--btn-plus-fill': filled ? half.accent : 'transparent',
     '--btn-plus-ink': filled ? half.accentInk : ink,
-    '--btn-plus-border': filled ? 'transparent' : ink,
+    '--btn-plus-border': filled ? (theme.outline?.color ?? 'transparent') : ink,
     '--btn-minus-fill': filled ? half.surface : 'transparent',
-    '--btn-minus-ink': filled ? ink : mutedInk,
-    '--btn-minus-border': filled ? 'transparent' : mutedInk,
-    '--clock-warn': theme.warn,
-    '--clock-danger': theme.danger,
+    // The filled -1 button keeps its own surface when waiting, so it keeps the authored ink.
+    '--btn-minus-ink': filled ? (half.surfaceInk ?? half.ink) : mutedInk,
+    '--btn-minus-border': filled ? (theme.outline?.color ?? 'transparent') : mutedInk,
+    '--btn-border-width': theme.outline?.width ?? '2px',
+    '--clock-warn': half.warn ?? theme.warn,
+    '--clock-danger': half.danger ?? theme.danger,
+  }
+}
+
+/** Colours for the full-page screens (Settings, match log), taken from the theme's
+ *  chrome pair so they match the match screen's centre bar. `line` is for borders,
+ *  `field` for inputs and raised cards. */
+export function pageVars(theme: Theme): Record<'--page-bg' | '--page-ink' | '--page-line' | '--page-field', string> {
+  const { bg, ink } = theme.chrome
+  return {
+    '--page-bg': bg,
+    '--page-ink': ink,
+    '--page-line': `color-mix(in srgb, ${ink} 25%, ${bg})`,
+    '--page-field': `color-mix(in srgb, ${ink} 8%, ${bg})`,
   }
 }

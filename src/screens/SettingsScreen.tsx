@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useMatch } from '@/match/MatchContext'
 import { useTheme } from '@/match/ThemeContext'
-import { THEMES } from '@/match/themes'
+import { THEMES, pageVars } from '@/match/themes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,12 +14,23 @@ import { MIN_START_MS } from '@/match/constants'
 export function SettingsScreen() {
   const { match, dispatch } = useMatch()
   const navigate = useNavigate()
-  const [minutes, setMinutes] = useState(String(Math.round(match.settings.startMs / 60000)))
+  const [minutes, setMinutes] = useState(match.settings.startMs.map((ms) => String(Math.round(ms / 60000))))
+  const setMinutesAt = (i: number, value: string) => setMinutes((prev) => prev.map((m, j) => (j === i ? value : m)))
+  const toMs = (m: string) => Math.max(MIN_START_MS, Number(m) * 60000)
+  const applyTime = () => dispatch({
+    type: 'SET_START_TIME',
+    ms: [toMs(minutes[0]), toMs(minutes[1])],
+    now: Date.now(),
+  })
   const [roundMinutes, setRoundMinutes] = useState(String(Math.round(match.roundTimer.durationMs / 60000)))
   const { theme, themeId, setTheme } = useTheme()
   const ninja = theme.displayFont ? 'font-ninja' : ''
   // The brush face crowds parentheses against their text, so pad them out — but only
   // on the display-font themes where that font is actually in use.
+  // The shadcn controls take their colours from fixed tokens, so they are pointed at
+  // the theme's page colours here.
+  const field = 'border-[color:var(--page-line)] bg-[color:var(--page-field)]'
+  const primary = 'bg-[color:var(--page-ink)] text-[color:var(--page-bg)] hover:bg-[color:var(--page-ink)] hover:opacity-90'
   const pad = (s: string) => (theme.displayFont ? s.replace(/\(/g, '( ').replace(/\)/g, ' )') : s)
 
   // Fade Settings out before returning to the match, so the backdrop colour change
@@ -33,7 +44,8 @@ export function SettingsScreen() {
   return (
     <div
       onAnimationEnd={onAnimEnd}
-      className={`${leaving ? 'page-out' : 'page-in'} flex min-h-full w-full flex-col gap-6 bg-slate-900 p-6 text-slate-100`}
+      className={`${leaving ? 'page-out' : 'page-in'} flex min-h-full w-full flex-col gap-6 p-6`}
+      style={{ ...pageVars(theme), backgroundColor: 'var(--page-bg)', color: 'var(--page-ink)' }}
     >
       <div className="flex items-center gap-3">
         <Link
@@ -48,16 +60,20 @@ export function SettingsScreen() {
         <Button variant="destructive" className="ml-auto" onClick={() => leave(() => dispatch({ type: 'NEW_MATCH' }))}>New match</Button>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="start" className={ninja}>{pad('Minutes per player (min 15)')}</Label>
-        <div className="flex gap-4">
-          <Input id="start" type="number" inputMode="numeric" min={15} value={minutes}
-            onChange={(e) => setMinutes(e.target.value)} />
-          <Button onClick={() => dispatch({ type: 'SET_START_TIME', ms: Math.max(MIN_START_MS, Number(minutes) * 60000) })}>
-            Apply time
-          </Button>
+      {/* One field per player, so a late player's clock can be docked. */}
+      <fieldset className="space-y-2">
+        <legend className={`mb-2 text-sm font-medium ${ninja}`}>{pad('Minutes per player (min 1)')}</legend>
+        <div className="grid grid-cols-2 gap-4">
+          {([0, 1] as const).map((i) => (
+            <div key={i} className="space-y-2">
+              <Label htmlFor={`start${i}`} className={ninja}>{match.players[i].name}</Label>
+              <Input id={`start${i}`} className={field} type="number" inputMode="numeric" min={1} value={minutes[i]}
+                onChange={(e) => setMinutesAt(i, e.target.value)} />
+            </div>
+          ))}
         </div>
-      </div>
+        <Button className={`w-full ${primary}`} onClick={applyTime}>Apply time</Button>
+      </fieldset>
 
       <div className="flex items-center justify-between">
         <Label htmlFor="round" className={ninja}>Shared round timer</Label>
@@ -68,9 +84,9 @@ export function SettingsScreen() {
       <div className="space-y-2">
         <Label htmlFor="roundlen" className={ninja}>{pad('Round length (minutes)')}</Label>
         <div className="flex gap-4">
-          <Input id="roundlen" type="number" inputMode="numeric" min={1} value={roundMinutes}
+          <Input id="roundlen" className={field} type="number" inputMode="numeric" min={1} value={roundMinutes}
             onChange={(e) => setRoundMinutes(e.target.value)} />
-          <Button onClick={() => dispatch({ type: 'SET_ROUND_DURATION', ms: Math.max(1, Number(roundMinutes)) * 60000 })}>
+          <Button className={primary} onClick={() => dispatch({ type: 'SET_ROUND_DURATION', ms: Math.max(1, Number(roundMinutes)) * 60000, now: Date.now() })}>
             Apply round
           </Button>
         </div>
@@ -84,8 +100,8 @@ export function SettingsScreen() {
             return (
               <label
                 key={t.id}
-                className={`flex cursor-pointer items-center justify-between rounded-lg border px-3 py-2 transition-colors focus-within:ring-2 focus-within:ring-slate-100 ${
-                  selected ? 'border-slate-100 bg-slate-800' : 'border-slate-700 hover:bg-slate-800/60'
+                className={`flex cursor-pointer items-center justify-between rounded-lg border px-3 py-2 transition-colors focus-within:ring-2 focus-within:ring-[color:var(--page-ink)] ${
+                  selected ? 'border-[color:var(--page-ink)] bg-[color:var(--page-field)]' : 'border-[color:var(--page-line)] hover:bg-[color:var(--page-field)]'
                 }`}
               >
                 <span className="flex items-center gap-3">
@@ -94,8 +110,8 @@ export function SettingsScreen() {
                   <span className="font-medium">{t.label}</span>
                 </span>
                 <span className="flex gap-1" aria-hidden="true">
-                  <span className="h-5 w-5 rounded-full border border-slate-500" style={{ background: t.players[0].bg }} />
-                  <span className="h-5 w-5 rounded-full border border-slate-500" style={{ background: t.players[1].bg }} />
+                  <span className="h-5 w-5 rounded-full border border-[color:var(--page-line)]" style={{ background: t.players[0].bg }} />
+                  <span className="h-5 w-5 rounded-full border border-[color:var(--page-line)]" style={{ background: t.players[1].bg }} />
                 </span>
               </label>
             )
@@ -105,13 +121,13 @@ export function SettingsScreen() {
 
       <ShareCard />
 
-      <footer className="mt-auto border-t border-slate-700/60 pt-4 text-center text-sm text-slate-400">
-        Found a bug or have a suggestion?{' '}
+      <footer className="mt-auto border-t border-[color:var(--page-line)] pt-4 text-center text-sm">
+        <span className="opacity-70">Found a bug or have a suggestion?</span>{' '}
         <a
           href="https://github.com/tomjn/mythos/issues"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-medium text-slate-200 underline underline-offset-2 hover:text-white"
+          className="font-medium underline underline-offset-2 hover:opacity-80"
         >
           Open an issue on GitHub
         </a>

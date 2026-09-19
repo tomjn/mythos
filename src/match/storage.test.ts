@@ -19,6 +19,17 @@ describe('storage', () => {
     saveMatch(m)
     expect(loadMatch()?.dice).toBeNull()
   })
+  it('upgrades a match saved before per-player start times and the log', () => {
+    const old = { ...createInitialMatch(MIN_START_MS), log: undefined, settings: { startMs: 1_800_000 } }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(old))
+    const m = loadMatch()
+    expect(m?.settings.startMs).toEqual([1_800_000, 1_800_000])
+    expect(m?.log).toEqual([])
+  })
+  it('returns null when the start times are malformed', () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...createInitialMatch(), settings: { startMs: ['a', 1] } }))
+    expect(loadMatch()).toBeNull()
+  })
   it('returns null on corrupt data', () => {
     localStorage.setItem(STORAGE_KEY, '{not json')
     expect(loadMatch()).toBeNull()

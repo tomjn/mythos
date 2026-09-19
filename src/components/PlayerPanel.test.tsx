@@ -41,7 +41,7 @@ describe('PlayerPanel', () => {
       ],
       active: null, activeSince: null, edge: null, paused: true,
       roundTimer: { enabled: true, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
-      settings: { startMs: 900000 },
+      settings: { startMs: [900000, 900000] }, log: [],
     }))
     render(<MatchProvider><PlayerPanel index={0} flipped={false} /></MatchProvider>)
     expect(screen.getByTestId('tap-surface-0')).toBeDisabled()
@@ -55,7 +55,7 @@ describe('PlayerPanel', () => {
       ],
       active: 0, activeSince: 1000, edge: null, paused: false,
       roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
-      settings: { startMs: 900000 },
+      settings: { startMs: [900000, 900000] }, log: [],
     }))
     const { container } = render(
       <MatchProvider>
@@ -76,7 +76,7 @@ describe('PlayerPanel', () => {
       ],
       active: 0, activeSince: null, edge: null, paused: true,
       roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
-      settings: { startMs: 900000 },
+      settings: { startMs: [900000, 900000] }, log: [],
     }))
     const { container } = render(
       <MatchProvider>
@@ -97,7 +97,7 @@ describe('PlayerPanel', () => {
       ],
       active: 0, activeSince: 1000, edge: null, paused: false,
       roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
-      settings: { startMs: 900000 },
+      settings: { startMs: [900000, 900000] }, log: [],
     }))
     const { container } = render(<MatchProvider><PlayerPanel index={0} flipped={false} /></MatchProvider>)
     const panel = container.querySelector('[data-running="true"]') as HTMLElement

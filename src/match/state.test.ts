@@ -20,8 +20,8 @@ describe('createInitialMatch', () => {
     expect(m.edge).toBeNull()
   })
   it('enforces the 15-minute floor', () => {
-    const m = createInitialMatch(60_000)
-    expect(m.settings.startMs).toBe(MIN_START_MS)
+    const m = createInitialMatch(1000)
+    expect(m.settings.startMs).toEqual([MIN_START_MS, MIN_START_MS])
     expect(m.players[0].clockMs).toBe(MIN_START_MS)
   })
   it('seeds a disabled round timer at default duration', () => {

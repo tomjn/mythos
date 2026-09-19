@@ -8,7 +8,7 @@ function Probe() {
   return (
     <div>
       <span data-testid="edge">{String(match.edge)}</span>
-      <button onClick={() => dispatch({ type: 'SET_EDGE', player: 0 })}>edge0</button>
+      <button onClick={() => dispatch({ type: 'SET_EDGE', player: 0, now: 0 })}>edge0</button>
     </div>
   )
 }
@@ -32,7 +32,7 @@ describe('MatchProvider', () => {
       ],
       active: null, activeSince: null, edge: 1, paused: true,
       roundTimer: { enabled: false, durationMs: 1, remainingMs: 1 }, roundSince: null,
-      settings: { startMs: 1800000 },
+      settings: { startMs: [1800000, 1800000] }, log: [],
     })
     localStorage.setItem('mythos-match-v1', stored)
     render(<MatchProvider><Probe /></MatchProvider>)

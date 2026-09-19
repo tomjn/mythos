@@ -13,6 +13,9 @@
 
 :root { color-scheme: dark; }
 html, body, #root { height: 100%; margin: 0; }
+/* The app never scrolls sideways: no horizontal overflow, and touch drags only pan
+   vertically (Settings and the match log scroll; the match screen does not). */
+html, body { overflow-x: hidden; touch-action: pan-y; }
 body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
 
 

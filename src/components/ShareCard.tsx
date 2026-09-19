@@ -12,8 +12,8 @@ export function ShareCard() {
   const url = shareUrl()
   const { theme } = useTheme()
   return (
-    <section className="flex flex-col items-center gap-3 rounded-xl bg-slate-800/50 p-5 text-center">
-      <h2 className={`text-sm font-semibold uppercase tracking-widest text-slate-300 ${theme.displayFont ? 'font-ninja' : ''}`}>Share</h2>
+    <section className="flex flex-col items-center gap-3 rounded-xl bg-[color:var(--page-field)] p-5 text-center">
+      <h2 className={`text-sm font-semibold uppercase tracking-widest opacity-80 ${theme.displayFont ? 'font-ninja' : ''}`}>Share</h2>
       <div className="rounded-xl bg-white p-3">
         <QRCodeSVG
           value={url}
@@ -29,7 +29,7 @@ export function ShareCard() {
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="break-all text-sm text-slate-300 underline underline-offset-2 hover:text-white"
+        className="break-all text-sm underline underline-offset-2 opacity-80 hover:opacity-100"
       >
         {url}
       </a>

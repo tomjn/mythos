@@ -48,4 +48,24 @@ describe('MatchScreen', () => {
     expect(container.querySelectorAll('.side-out')).toHaveLength(3)
     expect(screen.queryByText('settings route')).not.toBeInTheDocument()
   })
+
+  it('pauses and leaves for the match log the same way once the match has started', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/']}>
+        <MatchProvider>
+          <Routes>
+            <Route path="/" element={<MatchScreen />} />
+            <Route path="/log" element={<div>log route</div>} />
+          </Routes>
+        </MatchProvider>
+      </MemoryRouter>,
+    )
+    fireEvent.click(screen.getByTestId('tap-surface-0'))
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText('Match log'))
+    // Opening the log pauses the match.
+    expect(screen.getByRole('button', { name: 'Resume' })).toBeInTheDocument()
+    expect(container.querySelectorAll('.side-out')).toHaveLength(3)
+    expect(screen.queryByText('log route')).not.toBeInTheDocument()
+  })
 })

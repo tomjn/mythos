@@ -1,6 +1,6 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { Dices, Pause, Play, Settings } from 'lucide-react'
+import { Dices, Pause, Play, ScrollText, Settings } from 'lucide-react'
 import { useMatch } from '@/match/MatchContext'
 import { useTheme } from '@/match/ThemeContext'
 import type { PlayerIndex } from '@/match/types'
@@ -13,7 +13,7 @@ const DICE_TOTAL_MS = DICE_HOLD_MS + DICE_FADE_MS
 // How far each roll is nudged out of the bar toward its own player's panel.
 const DICE_OFFSET_PX = 40
 
-export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }: { vertical?: boolean; onOpenSettings?: () => void; animClass?: string }) {
+export function CenterBand({ vertical = false, onNavigate, animClass = '' }: { vertical?: boolean; onNavigate?: (to: string) => void; animClass?: string }) {
   const { match, dispatch } = useMatch()
   const { theme } = useTheme()
   const ninja = theme.displayFont ? 'font-ninja' : ''
@@ -71,9 +71,9 @@ export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }:
     </span>
   ) : (
     <button type="button" aria-label={match.paused ? 'Resume' : 'Pause'} onClick={toggle}
-      className={`hover-lift rounded-full p-2 active:scale-95 ${match.paused ? 'paused-pulse' : ''}`}
+      className={`hover-lift flex items-center justify-center rounded-full active:scale-95 ${vertical ? 'self-stretch px-2' : 'flex-1 py-2'} ${match.paused ? 'paused-pulse' : ''}`}
       style={{ backgroundColor: buttonBg, '--pulse': theme.chrome.ink } as CSSProperties}>
-      {match.paused ? <Play size={20} /> : <Pause size={20} />}
+      {match.paused ? <Play size={24} /> : <Pause size={24} />}
     </button>
   )
 
@@ -139,14 +139,27 @@ export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }:
     </div>
   )
 
+  // Links leave through onNavigate when given, so the match screen can play its exit
+  // animation before the route changes.
+  // `pauses` stops the clocks on the way out (the match log uses it, so nobody loses
+  // time reading it). The match stays paused on return until someone resumes it.
+  const navLink = (to: string, label: string, icon: ReactNode, className: string, pauses = false) => (
+    <Link to={to} aria-label={label} className={className}
+      onClick={(e) => {
+        if (pauses) dispatch({ type: 'PAUSE', now: Date.now(), byLog: true })
+        if (onNavigate) { e.preventDefault(); onNavigate(to) }
+      }}>{icon}</Link>
+  )
+
   // Vertical: a thin strip between the two columns (settings on top, the
   // pause/start control centred below it). Horizontal: the original band.
   if (vertical) {
     return (
       <div className={`relative z-10 flex min-w-11 flex-col items-center gap-4 px-1 py-4 ${animClass}`} style={chrome}>
-        <Link to="/settings" aria-label="Settings" className="hover-lift rounded-lg p-2"
-          onClick={(e) => { if (onOpenSettings) { e.preventDefault(); onOpenSettings() } }}><Settings size={20} /></Link>
-        {!matchStarted && diceTrigger('hover-lift rounded-lg p-2 active:scale-95')}
+        {navLink('/settings', 'Settings', <Settings size={20} />, 'hover-lift rounded-lg p-2')}
+        {matchStarted
+          ? navLink('/log', 'Match log', <ScrollText size={20} />, 'hover-lift rounded-lg p-2', true)
+          : diceTrigger('hover-lift rounded-lg p-2 active:scale-95')}
         <div className="flex flex-1 items-center">{control}</div>
       </div>
     )
@@ -154,11 +167,12 @@ export function CenterBand({ vertical = false, onOpenSettings, animClass = '' }:
 
   return (
     <div className={`relative z-10 flex min-h-11 items-center justify-between gap-4 px-4 ${animClass}`} style={chrome}>
-      {/* Spacer keeps the control centred opposite Settings once the dice button is gone. */}
-      {matchStarted ? <span className="w-10" /> : diceTrigger('hover-lift flex items-center self-stretch rounded-lg px-3 active:scale-95', 'flex self-stretch')}
+      {/* Once play begins the dice button gives its place to the match log. */}
+      {matchStarted
+        ? navLink('/log', 'Match log', <ScrollText size={20} />, 'hover-lift flex items-center self-stretch rounded-lg px-3', true)
+        : diceTrigger('hover-lift flex items-center self-stretch rounded-lg px-3 active:scale-95', 'flex self-stretch')}
       {control}
-      <Link to="/settings" aria-label="Settings" className="hover-lift flex items-center self-stretch rounded-lg px-3"
-        onClick={(e) => { if (onOpenSettings) { e.preventDefault(); onOpenSettings() } }}><Settings size={20} /></Link>
+      {navLink('/settings', 'Settings', <Settings size={20} />, 'hover-lift flex items-center self-stretch rounded-lg px-3')}
     </div>
   )
 }

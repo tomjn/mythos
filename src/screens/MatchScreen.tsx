@@ -12,14 +12,16 @@ export function MatchScreen() {
   const { theme } = useTheme()
   const split = useSplitLayout()
   const navigate = useNavigate()
-  const [leaving, setLeaving] = useState(false)
+  const [leavingTo, setLeavingTo] = useState<string | null>(null)
+  const leaving = leavingTo != null
   useWakeLock(!match.paused && (match.active != null || match.roundTimer.enabled))
 
   // The halves slide in from their outer edge on mount and reverse out when Settings
-  // opens; the gear tap flips `leaving`, then this navigates once the exit finishes.
+  // or the match log opens; the tap sets `leavingTo`, then this navigates once the
+  // exit finishes.
   const sideClass = leaving ? 'side-out' : 'side-in'
   const onAnimEnd = (e: React.AnimationEvent) => {
-    if (leaving && e.animationName === 'side-out') navigate('/settings')
+    if (leavingTo != null && e.animationName === 'side-out') navigate(leavingTo)
   }
   // A third of each half's size — it stays mostly on screen, so the fade reads softly
   // instead of completing while clipped off-slot.
@@ -43,7 +45,7 @@ export function MatchScreen() {
       {/* Portrait stacks the halves face-to-face (P1 flipped 180). Split landscape
           puts them side-by-side, both upright, so the device can sit any way up. */}
       <div className={`min-h-0 min-w-0 flex-1 ${sideClass}`} style={{ ...p1Offset }}><PlayerPanel index={1} flipped={!split} /></div>
-      <CenterBand vertical={split} onOpenSettings={() => setLeaving(true)} animClass={sideClass} />
+      <CenterBand vertical={split} onNavigate={setLeavingTo} animClass={sideClass} />
       <div className={`min-h-0 min-w-0 flex-1 ${sideClass}`} style={{ ...p2Offset }}><PlayerPanel index={0} flipped={false} /></div>
     </div>
   )

@@ -15,7 +15,7 @@ function seedDice(dice: unknown) {
     ],
     active: null, activeSince: null, edge: null, paused: true,
     roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
-    settings: { startMs: 900000 }, dice,
+    settings: { startMs: [900000, 900000] }, log: [], dice,
   }))
 }
 
@@ -171,7 +171,7 @@ describe('CenterBand', () => {
       ],
       active: 0, activeSince: null, edge: null, paused: true,
       roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
-      settings: { startMs: 900000 }, dice: null,
+      settings: { startMs: [900000, 900000] }, log: [], dice: null,
     }))
     renderBand()
     expect(screen.getByRole('button', { name: /resume/i })).toHaveClass('paused-pulse')
@@ -185,15 +185,16 @@ describe('CenterBand', () => {
       ],
       active: 0, activeSince: 1000, edge: null, paused: false,
       roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
-      settings: { startMs: 900000 }, dice: null,
+      settings: { startMs: [900000, 900000] }, log: [], dice: null,
     }))
     renderBand()
     expect(screen.getByRole('button', { name: /pause/i })).not.toHaveClass('paused-pulse')
   })
 
-  it('shows the dice button before the match starts', () => {
+  it('shows the dice button, not the match log link, before the match starts', () => {
     renderBand()
     expect(screen.getByRole('button', { name: /roll dice/i })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /match log/i })).toBeNull()
   })
 
   it('hides the dice button once the match has started (a clock is active)', () => {
@@ -204,10 +205,12 @@ describe('CenterBand', () => {
       ],
       active: 0, activeSince: 1000, edge: null, paused: false,
       roundTimer: { enabled: false, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
-      settings: { startMs: 900000 }, dice: null,
+      settings: { startMs: [900000, 900000] }, log: [], dice: null,
     }))
     renderBand()
     expect(screen.queryByRole('button', { name: /roll dice/i })).toBeNull()
+    // The match log link takes the dice button's place.
+    expect(screen.getByRole('link', { name: /match log/i })).toHaveAttribute('href', '/log')
   })
 
   it('does not show a roll restored from storage that is already older than 10s', () => {
@@ -241,7 +244,7 @@ describe('CenterBand', () => {
       ],
       active: null, activeSince: null, edge: null, paused: true,
       roundTimer: { enabled: true, durationMs: 1500000, remainingMs: 1500000 }, roundSince: null,
-      settings: { startMs: 900000 },
+      settings: { startMs: [900000, 900000] }, log: [],
     }))
     render(
       <MemoryRouter>

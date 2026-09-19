@@ -10,7 +10,7 @@ beforeEach(() => localStorage.clear())
 
 function StartProbe() {
   const { match } = useMatch()
-  return <span data-testid="start">{match.settings.startMs}</span>
+  return <span data-testid="start">{match.settings.startMs.join(',')}</span>
 }
 
 function ThemeProbe() {
@@ -19,17 +19,33 @@ function ThemeProbe() {
 }
 
 describe('SettingsScreen', () => {
-  it('enforces the 15-minute floor on start time', async () => {
+  const setMinutes = async (label: RegExp, value: string) => {
+    const input = screen.getByLabelText(label)
+    await userEvent.clear(input)
+    await userEvent.type(input, value)
+  }
+
+  it('enforces the 1-minute floor on start time', async () => {
     render(
       <MemoryRouter>
         <MatchProvider><SettingsScreen /><StartProbe /></MatchProvider>
       </MemoryRouter>,
     )
-    const input = screen.getByLabelText(/minutes per player/i)
-    await userEvent.clear(input)
-    await userEvent.type(input, '10')
+    await setMinutes(/player 1/i, '0')
     await userEvent.click(screen.getByRole('button', { name: /apply time/i }))
-    expect(screen.getByTestId('start').textContent).toBe(String(15 * 60 * 1000))
+    expect(screen.getByTestId('start').textContent).toBe('60000,900000')
+  })
+
+  it('sets a time for each player, e.g. to dock a late player', async () => {
+    render(
+      <MemoryRouter>
+        <MatchProvider><SettingsScreen /><StartProbe /></MatchProvider>
+      </MemoryRouter>,
+    )
+    await setMinutes(/player 1/i, '20')
+    await setMinutes(/player 2/i, '11')
+    await userEvent.click(screen.getByRole('button', { name: /apply time/i }))
+    expect(screen.getByTestId('start').textContent).toBe('1200000,660000')
   })
 
   it('toggles the round timer', async () => {

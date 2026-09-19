@@ -14,11 +14,14 @@ on one screen.
 ## Features
 
 - **Per-player chess clocks** — tap your half of the screen to end your turn and
-  start the opponent's clock. Minimum 15 minutes per player.
+  start the opponent's clock. Each player's time is set separately (default 15
+  minutes, minimum 1), so a late player's clock can be docked.
 - **Shared round timer** — an optional mode that replaces the chess clocks with a
-  single countdown shared by both players (default 25 minutes).
-- **Chakra and Mission counters** — per-player tallies with quick adjust and reset
-  (chakra resets to the game base of 5).
+  single countdown shared by both players (default 30 minutes).
+- **Chakra and Mission counters** — per-player tallies with +1 and -1, a +5 button
+  for chakra and a reset for mission. Recent taps show as a running total.
+- **Match log** — a timestamped record of every change, opened from the centre bar
+  once play begins. Opening it pauses the match.
 - **Edge marker** — track which player currently holds the edge.
 - **Pause / resume and timeout** handling.
 - **Persistent state** — the current match is saved to `localStorage`, so a
@@ -58,7 +61,7 @@ also works when embedded at a sub-path elsewhere.
 ## Tech stack
 
 - **React 19** + **TypeScript**, bundled with **Vite**
-- **React Router** (HashRouter) for the match and settings screens
+- **React Router** (HashRouter) for the match, settings and log screens
 - **Tailwind CSS** with **shadcn/ui** components built on **Radix UI**
 - **Vitest** + **Testing Library** for unit and component tests
 
@@ -67,7 +70,7 @@ also works when embedded at a sub-path elsewhere.
 ```
 src/
   match/        Match state: types, reducer, timing, storage, formatting
-  screens/      MatchScreen and SettingsScreen
+  screens/      MatchScreen, SettingsScreen and LogScreen
   components/   PlayerPanel, CenterBand, clock/stat tiles, ui/ primitives
   hooks/        useWakeLock
 ```
